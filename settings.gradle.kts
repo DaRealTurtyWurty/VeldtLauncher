@@ -1,1 +1,1 @@
-rootProject.name = "MinecraftLauncher"
+rootProject.name = "VeldtLauncher"

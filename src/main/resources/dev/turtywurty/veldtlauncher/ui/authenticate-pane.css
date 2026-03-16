@@ -1,0 +1,64 @@
+.authenticate-pane {
+    -fx-background-color: #0d1321;
+}
+
+.authenticate-content {
+    -fx-alignment: center;
+}
+
+.authenticate-card {
+    -fx-background-color: rgba(18, 28, 44, 0.96);
+    -fx-background-radius: 28;
+    -fx-border-color: rgba(154, 205, 255, 0.18);
+    -fx-border-radius: 28;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.42), 40, 0.2, 0, 18);
+    -fx-padding: 32 28 28 28;
+    -fx-spacing: 14;
+}
+
+.authenticate-title {
+    -fx-fill: #f4f9ff;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 32px;
+    -fx-font-weight: 800;
+    -fx-text-alignment: center;
+}
+
+.authenticate-description {
+    -fx-fill: rgba(231, 240, 255, 0.78);
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 15px;
+    -fx-line-spacing: 3px;
+    -fx-text-alignment: center;
+}
+
+.authenticate-button {
+    -fx-alignment: center;
+    -fx-background-color: #1973d6;
+    -fx-background-insets: 0;
+    -fx-background-radius: 16;
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+    -fx-padding: 14 18 14 18;
+    -fx-text-fill: white;
+    -fx-graphic-text-gap: 12;
+}
+
+.authenticate-button:hover {
+    -fx-background-color: #2485ef;
+}
+
+.authenticate-button:pressed {
+    -fx-background-color: #145fae;
+}
+
+.authenticate-microsoft-icon {
+    -fx-icon-color: white;
+    -fx-icon-size: 18;
+}

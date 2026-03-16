@@ -25,8 +25,8 @@ tasks.withType<JavaCompile> {
 }
 
 application {
-    mainModule.set("dev.turtywurty.minecraftlauncher")
-    mainClass.set("dev.turtywurty.minecraftlauncher.MinecraftLauncherApp")
+    mainModule.set("dev.turtywurty.veldtlauncher")
+    mainClass.set("dev.turtywurty.veldtlauncher.VeldtLauncherApp")
 }
 
 javafx {
@@ -39,12 +39,15 @@ dependencies {
     implementation("org.kordamp.ikonli:ikonli-fontawesome6-pack:12.4.0")
     implementation("io.javalin:javalin:7.1.0")
     implementation("com.google.code.gson:gson:2.13.2")
+    implementation("org.slf4j:slf4j-api:2.0.17")
+    implementation("ch.qos.logback:logback-classic:1.5.32")
+    compileOnly("org.jetbrains:annotations:26.0.2")
 }
 
 jlink {
-    imageZip.set(layout.buildDirectory.file("/distributions/app-${javafx.platform.classifier}.zip"))
+    imageZip.set(layout.buildDirectory.file("/distributions/veldtlauncher-${javafx.platform.classifier}.zip"))
     options.set(listOf("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"))
     launcher {
-        name = "app"
+        name = "veldtlauncher"
     }
 }

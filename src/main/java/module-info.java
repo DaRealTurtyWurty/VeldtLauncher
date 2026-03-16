@@ -1,4 +1,4 @@
-module dev.turtywurty.minecraftlauncher {
+module dev.turtywurty.veldtlauncher {
     requires javafx.controls;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.fontawesome6;
@@ -6,8 +6,8 @@ module dev.turtywurty.minecraftlauncher {
     requires io.javalin;
     requires java.desktop;
     requires java.net.http;
-    requires annotations;
+    requires static org.jetbrains.annotations;
     requires com.google.gson;
 
-    exports dev.turtywurty.minecraftlauncher;
+    exports dev.turtywurty.veldtlauncher;
 }

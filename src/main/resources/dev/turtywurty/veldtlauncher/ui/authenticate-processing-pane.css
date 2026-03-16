@@ -1,0 +1,68 @@
+.authentication-processing-pane {
+    -fx-background-color: #0d1321;
+}
+
+.authenticate-processing-content {
+    -fx-alignment: center;
+}
+
+.authentication-processing-card {
+    -fx-background-color: rgba(18, 28, 44, 0.96);
+    -fx-background-radius: 28;
+    -fx-border-color: rgba(154, 205, 255, 0.18);
+    -fx-border-radius: 28;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 32, 0.18, 0, 14);
+    -fx-padding: 32 28 28 28;
+    -fx-spacing: 14;
+}
+
+.authentication-progress-indicator {
+    -fx-progress-color: #2f80ed;
+}
+
+.authentication-progress-indicator-failed {
+    -fx-progress-color: #d95c5c;
+}
+
+.authentication-processing-title {
+    -fx-fill: #f4f9ff;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 30px;
+    -fx-font-weight: 800;
+    -fx-text-alignment: center;
+}
+
+.authentication-processing-status {
+    -fx-fill: #dbe9ff;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+    -fx-text-alignment: center;
+}
+
+.authentication-processing-details {
+    -fx-fill: rgba(231, 240, 255, 0.74);
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+    -fx-line-spacing: 3px;
+    -fx-text-alignment: center;
+}
+
+.authentication-processing-back-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(154, 205, 255, 0.22);
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-padding: 10 16 10 16;
+    -fx-text-fill: #dbe9ff;
+}
+
+.authentication-processing-back-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+}
