@@ -1,0 +1,42 @@
+package dev.turtywurty.minecraftlauncher.auth;
+
+import java.net.URI;
+
+public final class AuthConfig {
+    public static final String DEFAULT_CLIENT_ID = "default-client-id";
+    public static final String DEFAULT_REDIRECT_URI_PATH = "oauth/callback";
+    public static final int DEFAULT_REDIRECT_URI_PORT = 43675;
+
+    private AuthConfig() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
+
+    public static String getClientId() {
+        return System.getenv().getOrDefault("AUTH_CLIENT_ID", DEFAULT_CLIENT_ID);
+    }
+
+    public static int getRedirectUriPort() {
+        String portStr = System.getenv("AUTH_REDIRECT_URI_PORT");
+        if (portStr != null) {
+            try {
+                return Integer.parseInt(portStr);
+            } catch (NumberFormatException _) {
+                System.err.println("Invalid port number in AUTH_REDIRECT_URI_PORT: " + portStr + ". Falling back to default port " + DEFAULT_REDIRECT_URI_PORT);
+            }
+        }
+
+        return DEFAULT_REDIRECT_URI_PORT;
+    }
+
+    public static String getRedirectUriPath() {
+        return System.getenv().getOrDefault("AUTH_REDIRECT_URI_PATH", DEFAULT_REDIRECT_URI_PATH);
+    }
+
+    public static URI getRedirectUri() {
+        return URI.create("%s:%d/%s".formatted(
+                "http://localhost",
+                getRedirectUriPort(),
+                getRedirectUriPath()
+        ));
+    }
+}
