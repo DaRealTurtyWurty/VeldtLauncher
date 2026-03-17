@@ -26,7 +26,7 @@ public final class MinecraftProfileService implements MinecraftProfileLookupServ
         this(HttpClient.newHttpClient());
     }
 
-    public MinecraftProfile getMinecraftProfile(MinecraftAccessToken accessToken) {
+    public MinecraftProfile lookupProfile(MinecraftAccessToken accessToken) {
         validateAccessToken(accessToken);
 
         HttpRequest request = HttpRequest.newBuilder(URI.create(PROFILE_URL))

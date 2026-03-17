@@ -1,6 +1,11 @@
 package dev.turtywurty.veldtlauncher.ui;
 
 import dev.turtywurty.veldtlauncher.auth.AuthEvent;
+import dev.turtywurty.veldtlauncher.auth.devicecode.event.DeviceCodeAuthorizationDeclinedEvent;
+import dev.turtywurty.veldtlauncher.auth.devicecode.event.DeviceCodeAuthorizationPendingEvent;
+import dev.turtywurty.veldtlauncher.auth.devicecode.event.DeviceCodePollingStartedEvent;
+import dev.turtywurty.veldtlauncher.auth.devicecode.event.DeviceCodeRequestedEvent;
+import dev.turtywurty.veldtlauncher.auth.devicecode.event.DeviceCodeSucceededEvent;
 import dev.turtywurty.veldtlauncher.auth.pkce.event.AuthenticationFailedEvent;
 import dev.turtywurty.veldtlauncher.auth.pkce.event.AuthenticationStartedEvent;
 import dev.turtywurty.veldtlauncher.auth.pkce.event.AuthenticationSucceededEvent;
@@ -13,14 +18,22 @@ import dev.turtywurty.veldtlauncher.auth.pkce.event.WaitingForCallbackEvent;
 import dev.turtywurty.veldtlauncher.auth.pkce.event.XboxAuthStartedEvent;
 import dev.turtywurty.veldtlauncher.event.EventListener;
 import dev.turtywurty.veldtlauncher.event.EventStream;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TextField;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
@@ -64,6 +77,40 @@ public class AuthenticationProcessingPane extends AnchorPane {
         details.getStyleClass().add("authentication-processing-details");
         details.wrappingWidthProperty().bind(card.maxWidthProperty().subtract(56));
 
+        var deviceCodeField = new TextField();
+        deviceCodeField.setEditable(false);
+        deviceCodeField.setFocusTraversable(false);
+        deviceCodeField.setMaxWidth(Double.MAX_VALUE);
+        deviceCodeField.getStyleClass().add("authentication-processing-copy-field");
+
+        var deviceCodeCopyButton = new Button("Copy");
+        deviceCodeCopyButton.getStyleClass().add("authentication-processing-copy-button");
+        deviceCodeCopyButton.setContentDisplay(ContentDisplay.TEXT_ONLY);
+        deviceCodeCopyButton.setOnAction(_ -> copyToClipboard(deviceCodeField.getText()));
+
+        var deviceCodeRow = new HBox(10, deviceCodeField, deviceCodeCopyButton);
+        deviceCodeRow.setAlignment(Pos.CENTER_LEFT);
+        deviceCodeRow.setManaged(false);
+        deviceCodeRow.setVisible(false);
+        deviceCodeRow.getStyleClass().add("authentication-processing-copy-row");
+
+        var verificationUriField = new TextField();
+        verificationUriField.setEditable(false);
+        verificationUriField.setFocusTraversable(false);
+        verificationUriField.setMaxWidth(Double.MAX_VALUE);
+        verificationUriField.getStyleClass().add("authentication-processing-copy-field");
+
+        var verificationUriCopyButton = new Button("Copy");
+        verificationUriCopyButton.getStyleClass().add("authentication-processing-copy-button");
+        verificationUriCopyButton.setContentDisplay(ContentDisplay.TEXT_ONLY);
+        verificationUriCopyButton.setOnAction(_ -> copyToClipboard(verificationUriField.getText()));
+
+        var verificationUriRow = new HBox(10, verificationUriField, verificationUriCopyButton);
+        verificationUriRow.setAlignment(Pos.CENTER_LEFT);
+        verificationUriRow.setManaged(false);
+        verificationUriRow.setVisible(false);
+        verificationUriRow.getStyleClass().add("authentication-processing-copy-row");
+
         var backButton = new Button("Back");
         backButton.getStyleClass().add("authentication-processing-back-button");
         backButton.setManaged(false);
@@ -74,22 +121,42 @@ public class AuthenticationProcessingPane extends AnchorPane {
             }
         });
 
-        card.getChildren().addAll(indicator, title, status, details, backButton);
+        HBox.setHgrow(deviceCodeField, javafx.scene.layout.Priority.ALWAYS);
+        HBox.setHgrow(verificationUriField, javafx.scene.layout.Priority.ALWAYS);
+
+        card.getChildren().addAll(indicator, title, status, details, deviceCodeRow, verificationUriRow, backButton);
         content.getChildren().add(card);
         getChildren().add(content);
 
         AtomicReference<EventListener<AuthEvent>> listenerRef = new AtomicReference<>();
+        AtomicReference<Timeline> countdownRef = new AtomicReference<>();
+        AtomicReference<DeviceCodeRequestedEvent> deviceCodeRef = new AtomicReference<>();
         sceneProperty().addListener((_, oldScene, newScene) -> {
             EventListener<AuthEvent> currentListener = listenerRef.getAndSet(null);
             if (currentListener != null) {
                 eventStream.unregisterListener(currentListener);
             }
 
-            if (newScene == null)
+            if (newScene == null) {
+                stopCountdown(countdownRef);
                 return;
+            }
 
             EventListener<AuthEvent> listener = eventStream.registerListener(AuthEvent.class, event ->
-                    Platform.runLater(() -> applyEvent(event, indicator, title, status, details, backButton)));
+                    Platform.runLater(() -> applyEvent(
+                            event,
+                            indicator,
+                            title,
+                            status,
+                            details,
+                            deviceCodeRow,
+                            deviceCodeField,
+                            verificationUriRow,
+                            verificationUriField,
+                            backButton,
+                            countdownRef,
+                            deviceCodeRef
+                    )));
             listenerRef.set(listener);
         });
     }
@@ -100,27 +167,80 @@ public class AuthenticationProcessingPane extends AnchorPane {
             Text title,
             Text status,
             Text details,
-            Button backButton
+            HBox deviceCodeRow,
+            TextField deviceCodeField,
+            HBox verificationUriRow,
+            TextField verificationUriField,
+            Button backButton,
+            AtomicReference<Timeline> countdownRef,
+            AtomicReference<DeviceCodeRequestedEvent> deviceCodeRef
     ) {
         switch (event) {
             case AuthenticationStartedEvent ignored -> {
+                stopCountdown(countdownRef);
+                deviceCodeRef.set(null);
+                hideCopyFields(deviceCodeRow, deviceCodeField, verificationUriRow, verificationUriField);
                 title.setText("Authenticating...");
                 status.setText("Preparing your secure Microsoft login.");
                 details.setText("The launcher is setting up a local callback so it can finish sign-in.");
             }
+            case DeviceCodeRequestedEvent deviceCodeEvent -> {
+                stopCountdown(countdownRef);
+                deviceCodeRef.set(deviceCodeEvent);
+                showCopyFields(deviceCodeEvent, deviceCodeRow, deviceCodeField, verificationUriRow, verificationUriField);
+                status.setText("Device code ready.");
+                details.setText(buildDeviceCodeMessage(deviceCodeEvent));
+            }
+            case DeviceCodePollingStartedEvent deviceCodeEvent -> {
+                stopCountdown(countdownRef);
+                showCopyFields(deviceCodeRef.get(), deviceCodeRow, deviceCodeField, verificationUriRow, verificationUriField);
+                status.setText("Waiting for device-code approval...");
+                details.setText(buildDeviceCodePollingMessage(deviceCodeRef.get(), -1));
+            }
+            case DeviceCodeAuthorizationPendingEvent deviceCodeEvent -> {
+                showCopyFields(deviceCodeRef.get(), deviceCodeRow, deviceCodeField, verificationUriRow, verificationUriField);
+                status.setText("Waiting for device-code approval...");
+                startCountdown(deviceCodeEvent.pollingIntervalSeconds(), details, countdownRef, deviceCodeRef.get());
+            }
+            case DeviceCodeAuthorizationDeclinedEvent ignored -> {
+                stopCountdown(countdownRef);
+                showCopyFields(deviceCodeRef.get(), deviceCodeRow, deviceCodeField, verificationUriRow, verificationUriField);
+                status.setText("Device-code authorization declined.");
+                details.setText("The Microsoft device-code request was declined before authentication could finish.");
+            }
+            case DeviceCodeSucceededEvent ignored -> {
+                stopCountdown(countdownRef);
+                hideCopyFields(deviceCodeRow, deviceCodeField, verificationUriRow, verificationUriField);
+                status.setText("Microsoft device-code login complete.");
+                details.setText("Requesting Xbox Live credentials for your Microsoft account.");
+            }
             case CallbackServerStartedEvent callbackEvent -> {
+                stopCountdown(countdownRef);
+                hideCopyFields(deviceCodeRow, deviceCodeField, verificationUriRow, verificationUriField);
                 status.setText("Callback server is ready.");
                 details.setText("Listening on " + callbackEvent.redirectUri() + " for the Microsoft redirect.");
             }
             case OpeningBrowserEvent ignored -> {
                 status.setText("Opening browser...");
-                details.setText("Approve the sign-in request in your browser to continue.");
+                DeviceCodeRequestedEvent deviceCodeEvent = deviceCodeRef.get();
+                if (deviceCodeEvent != null) {
+                    showCopyFields(deviceCodeEvent, deviceCodeRow, deviceCodeField, verificationUriRow, verificationUriField);
+                } else {
+                    hideCopyFields(deviceCodeRow, deviceCodeField, verificationUriRow, verificationUriField);
+                }
+                details.setText(deviceCodeEvent != null
+                        ? buildDeviceCodePollingMessage(deviceCodeEvent, -1)
+                        : "Approve the sign-in request in your browser to continue.");
             }
             case WaitingForCallbackEvent ignored -> {
+                stopCountdown(countdownRef);
+                hideCopyFields(deviceCodeRow, deviceCodeField, verificationUriRow, verificationUriField);
                 status.setText("Waiting for Microsoft callback...");
                 details.setText("Finish sign-in in your browser, then return here while the launcher receives the response.");
             }
             case AuthorizationCallbackReceivedEvent callbackEvent -> {
+                stopCountdown(countdownRef);
+                hideCopyFields(deviceCodeRow, deviceCodeField, verificationUriRow, verificationUriField);
                 status.setText(callbackEvent.error()
                         ? "Microsoft returned an error."
                         : "Authorization callback received.");
@@ -129,19 +249,27 @@ public class AuthenticationProcessingPane extends AnchorPane {
                         : "Continuing with Xbox and Minecraft authentication.");
             }
             case MicrosoftLoginSucceededEvent ignored -> {
+                stopCountdown(countdownRef);
+                hideCopyFields(deviceCodeRow, deviceCodeField, verificationUriRow, verificationUriField);
                 status.setText("Microsoft login complete.");
                 details.setText("Requesting Xbox Live credentials for your Microsoft account.");
             }
             case XboxAuthStartedEvent ignored -> {
+                stopCountdown(countdownRef);
+                hideCopyFields(deviceCodeRow, deviceCodeField, verificationUriRow, verificationUriField);
                 status.setText("Authorizing with Xbox Live...");
                 details.setText("Exchanging your Microsoft session for Xbox and XSTS tokens.");
             }
             case MinecraftProfileFetchedEvent profileEvent -> {
+                stopCountdown(countdownRef);
+                hideCopyFields(deviceCodeRow, deviceCodeField, verificationUriRow, verificationUriField);
                 title.setText("Minecraft profile found.");
                 status.setText("Signed in as " + profileEvent.username() + ".");
                 details.setText("Profile " + profileEvent.uuid() + " was fetched successfully.");
             }
             case AuthenticationSucceededEvent succeededEvent -> {
+                stopCountdown(countdownRef);
+                hideCopyFields(deviceCodeRow, deviceCodeField, verificationUriRow, verificationUriField);
                 indicator.setProgress(1);
                 title.setText("Authentication complete.");
                 status.setText("Welcome, " + succeededEvent.username() + ".");
@@ -150,6 +278,10 @@ public class AuthenticationProcessingPane extends AnchorPane {
                 backButton.setVisible(false);
             }
             case AuthenticationFailedEvent failedEvent -> {
+                stopCountdown(countdownRef);
+                if (deviceCodeRef.get() == null) {
+                    hideCopyFields(deviceCodeRow, deviceCodeField, verificationUriRow, verificationUriField);
+                }
                 if (!indicator.getStyleClass().contains("authentication-progress-indicator-failed")) {
                     indicator.getStyleClass().add("authentication-progress-indicator-failed");
                 }
@@ -163,5 +295,117 @@ public class AuthenticationProcessingPane extends AnchorPane {
             default -> {
             }
         }
+    }
+
+    private void startCountdown(
+            long seconds,
+            Text details,
+            AtomicReference<Timeline> countdownRef,
+            DeviceCodeRequestedEvent deviceCodeEvent
+    ) {
+        stopCountdown(countdownRef);
+
+        final long[] remaining = {Math.max(1, seconds)};
+        details.setText(buildDeviceCodePollingMessage(deviceCodeEvent, remaining[0]));
+
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), _ -> {
+            remaining[0]--;
+            if (remaining[0] > 0) {
+                details.setText(buildDeviceCodePollingMessage(deviceCodeEvent, remaining[0]));
+            } else {
+                details.setText(buildDeviceCodePollingMessage(deviceCodeEvent, 0));
+                stopCountdown(countdownRef);
+            }
+        }));
+        timeline.setCycleCount((int) remaining[0]);
+        countdownRef.set(timeline);
+        timeline.play();
+    }
+
+    private void stopCountdown(AtomicReference<Timeline> countdownRef) {
+        Timeline countdown = countdownRef.getAndSet(null);
+        if (countdown != null) {
+            countdown.stop();
+        }
+    }
+
+    private String buildDeviceCodeMessage(DeviceCodeRequestedEvent event) {
+        if (event == null)
+            return "Use the Microsoft device code flow in your browser to continue.";
+
+        if (event.message() != null && !event.message().isBlank())
+            return event.message();
+
+        return "Use code " + event.userCode() + " at " + event.verificationUri() + ".";
+    }
+
+    private String buildDeviceCodePollingMessage(DeviceCodeRequestedEvent event, long secondsRemaining) {
+        if (event == null) {
+            return secondsRemaining >= 0
+                    ? "Still waiting for Microsoft approval. Checking again in " + secondsRemaining + " seconds."
+                    : "Finish the Microsoft device-code step in your browser to continue.";
+        }
+
+        StringBuilder builder = new StringBuilder()
+                .append("Enter code ")
+                .append(event.userCode())
+                .append(" at ")
+                .append(event.verificationUri())
+                .append(".");
+
+        if (secondsRemaining > 0) {
+            builder.append(" Checking again in ").append(secondsRemaining).append(" seconds.");
+        } else if (secondsRemaining == 0) {
+            builder.append(" Checking again now.");
+        } else {
+            builder.append(" Waiting for approval in your browser.");
+        }
+
+        return builder.toString();
+    }
+
+    private void showCopyFields(
+            DeviceCodeRequestedEvent event,
+            HBox deviceCodeRow,
+            TextField deviceCodeField,
+            HBox verificationUriRow,
+            TextField verificationUriField
+    ) {
+        if (event == null) {
+            hideCopyFields(deviceCodeRow, deviceCodeField, verificationUriRow, verificationUriField);
+            return;
+        }
+
+        deviceCodeField.setText(event.userCode());
+        deviceCodeRow.setManaged(true);
+        deviceCodeRow.setVisible(true);
+
+        verificationUriField.setText(String.valueOf(event.verificationUri()));
+        verificationUriRow.setManaged(true);
+        verificationUriRow.setVisible(true);
+    }
+
+    private void hideCopyFields(
+            HBox deviceCodeRow,
+            TextField deviceCodeField,
+            HBox verificationUriRow,
+            TextField verificationUriField
+    ) {
+        deviceCodeField.clear();
+        deviceCodeRow.setManaged(false);
+        deviceCodeRow.setVisible(false);
+
+        verificationUriField.clear();
+        verificationUriRow.setManaged(false);
+        verificationUriRow.setVisible(false);
+    }
+
+    private void copyToClipboard(String value) {
+        if (value == null || value.isBlank())
+            return;
+
+        ClipboardContent content = new ClipboardContent();
+        content.putString(value);
+        Clipboard.getSystemClipboard().setContent(content);
     }
 }

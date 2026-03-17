@@ -1,14 +1,17 @@
 package dev.turtywurty.veldtlauncher.ui;
 
+import dev.turtywurty.veldtlauncher.auth.AuthStrategy;
+import dev.turtywurty.veldtlauncher.auth.devicecode.DeviceCodeAuthStrategy;
 import dev.turtywurty.veldtlauncher.auth.pkce.PkceAuthStrategy;
 import dev.turtywurty.veldtlauncher.event.SimpleEventStream;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import org.kordamp.ikonli.fontawesome6.FontAwesomeBrands;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -50,34 +53,42 @@ public class AuthenticatePane extends AnchorPane {
         var button = new Button("Continue with Microsoft", microsoftIcon);
         button.setMaxWidth(Double.MAX_VALUE);
         button.getStyleClass().add("authenticate-button");
-        button.setOnAction(_ -> {
-            var eventStream = new SimpleEventStream();
-            var authStrategy = new PkceAuthStrategy(eventStream);
-            var scene = getScene();
-            var processingPane = new AuthenticationProcessingPane(eventStream, () -> {
-                if (scene != null) {
-                    scene.setRoot(new AuthenticatePane());
-                }
-            });
+        button.setOnAction(_ -> startAuthentication(new PkceAuthStrategy(new SimpleEventStream())));
 
-            if (scene != null) {
-                scene.setRoot(processingPane);
-            }
+        var havingTroubleSigningIn = new Hyperlink("Having trouble signing in?");
+        havingTroubleSigningIn.getStyleClass().add("authenticate-having-trouble");
+        havingTroubleSigningIn.setOnAction(_ -> startAuthentication(new DeviceCodeAuthStrategy(new SimpleEventStream())));
 
-            button.setDisable(true);
-            Thread.startVirtualThread(() -> {
-                try {
-                    authStrategy.authenticate();
-                } catch (Exception ignored) {
-                } finally {
-                    Platform.runLater(() -> button.setDisable(false));
-                }
-            });
-        });
-
-        card.getChildren().addAll(title, description, button);
+        card.getChildren().addAll(title, description, button, havingTroubleSigningIn);
         content.getChildren().add(card);
 
         getChildren().add(content);
+    }
+
+    private void startAuthentication(AuthStrategy authStrategy) {
+        var eventStream = authStrategy.eventStream();
+        var scene = getScene();
+        var processingPane = new AuthenticationProcessingPane(eventStream, () -> {
+            if (scene != null) {
+                scene.setRoot(new AuthenticatePane());
+            }
+        });
+
+        if (scene != null) {
+            scene.setRoot(processingPane);
+        }
+
+        Thread.startVirtualThread(() -> {
+            try {
+                authStrategy.authenticate();
+            } catch (Exception ignored) {
+            } finally {
+                Platform.runLater(() -> {
+                    if (scene != null && scene.getRoot() == processingPane) {
+                        processingPane.requestFocus();
+                    }
+                });
+            }
+        });
     }
 }

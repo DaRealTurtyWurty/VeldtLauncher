@@ -49,6 +49,47 @@
     -fx-text-alignment: center;
 }
 
+.authentication-processing-copy-field {
+    -fx-background-color: rgba(10, 16, 28, 0.82);
+    -fx-background-insets: 0;
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(154, 205, 255, 0.22);
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-font-family: "Consolas", "Cascadia Code", monospace;
+    -fx-font-size: 14px;
+    -fx-highlight-fill: rgba(47, 128, 237, 0.45);
+    -fx-highlight-text-fill: #f4f9ff;
+    -fx-padding: 8 12 8 12;
+    -fx-text-fill: #f4f9ff;
+}
+
+.authentication-processing-copy-field .text {
+    -fx-text-alignment: center;
+}
+
+.authentication-processing-copy-row {
+    -fx-alignment: center-left;
+}
+
+.authentication-processing-copy-button {
+    -fx-background-color: rgba(47, 128, 237, 0.14);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(154, 205, 255, 0.24);
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-padding: 10 14 10 14;
+    -fx-text-fill: #dbe9ff;
+}
+
+.authentication-processing-copy-button:hover {
+    -fx-background-color: rgba(47, 128, 237, 0.22);
+}
+
 .authentication-processing-back-button {
     -fx-background-color: transparent;
     -fx-background-radius: 14;

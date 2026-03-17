@@ -1,0 +1,137 @@
+package dev.turtywurty.veldtlauncher.auth.devicecode;
+
+import dev.turtywurty.veldtlauncher.auth.*;
+import dev.turtywurty.veldtlauncher.auth.devicecode.event.DeviceCodePollingStartedEvent;
+import dev.turtywurty.veldtlauncher.auth.devicecode.event.DeviceCodeRequestedEvent;
+import dev.turtywurty.veldtlauncher.auth.devicecode.event.DeviceCodeSucceededEvent;
+import dev.turtywurty.veldtlauncher.auth.pkce.BrowserOpener;
+import dev.turtywurty.veldtlauncher.auth.pkce.DesktopBrowserOpener;
+import dev.turtywurty.veldtlauncher.auth.pkce.event.*;
+import dev.turtywurty.veldtlauncher.auth.pkce.microsoft.MicrosoftTokenSet;
+import dev.turtywurty.veldtlauncher.auth.pkce.minecraft.*;
+import dev.turtywurty.veldtlauncher.auth.pkce.xbox.XboxAuthService;
+import dev.turtywurty.veldtlauncher.auth.pkce.xbox.XboxAuthenticationService;
+import dev.turtywurty.veldtlauncher.auth.pkce.xbox.XboxToken;
+import dev.turtywurty.veldtlauncher.auth.pkce.xbox.xsts.XstsAuthService;
+import dev.turtywurty.veldtlauncher.auth.pkce.xbox.xsts.XstsAuthorizationService;
+import dev.turtywurty.veldtlauncher.auth.pkce.xbox.xsts.XstsToken;
+import dev.turtywurty.veldtlauncher.auth.session.MinecraftSession;
+import dev.turtywurty.veldtlauncher.event.EventStream;
+
+import java.net.URI;
+import java.util.Objects;
+
+public class DeviceCodeAuthStrategy implements AuthStrategy {
+    private final EventStream eventStream;
+    private final BrowserOpener browserOpener;
+    private final MicrosoftDeviceCodeService microsoftDeviceCodeService;
+    private final XboxAuthenticationService xboxAuthenticationService;
+    private final XstsAuthorizationService xstsAuthorizationService;
+    private final MinecraftAuthenticationService minecraftAuthenticationService;
+    private final MinecraftProfileLookupService minecraftProfileLookupService;
+
+    public DeviceCodeAuthStrategy(EventStream eventStream) {
+        this(
+                eventStream,
+                new DesktopBrowserOpener(),
+                new MicrosoftDeviceCodeClient(),
+                new XboxAuthService(),
+                new XstsAuthService(),
+                new MinecraftAuthService(),
+                new MinecraftProfileService()
+        );
+    }
+
+    public DeviceCodeAuthStrategy(
+            EventStream eventStream,
+            BrowserOpener browserOpener,
+            MicrosoftDeviceCodeService microsoftDeviceCodeService,
+            XboxAuthenticationService xboxAuthenticationService,
+            XstsAuthorizationService xstsAuthorizationService,
+            MinecraftAuthenticationService minecraftAuthenticationService,
+            MinecraftProfileLookupService minecraftProfileLookupService
+    ) {
+        this.eventStream = eventStream;
+        this.browserOpener = Objects.requireNonNull(browserOpener, "browserOpener");
+        this.microsoftDeviceCodeService = Objects.requireNonNull(microsoftDeviceCodeService, "microsoftDeviceCodeService");
+        this.xboxAuthenticationService = Objects.requireNonNull(xboxAuthenticationService, "xboxAuthenticationService");
+        this.xstsAuthorizationService = Objects.requireNonNull(xstsAuthorizationService, "xstsAuthorizationService");
+        this.minecraftAuthenticationService = Objects.requireNonNull(minecraftAuthenticationService, "minecraftAuthenticationService");
+        this.minecraftProfileLookupService = Objects.requireNonNull(minecraftProfileLookupService, "minecraftProfileLookupService");
+    }
+
+    @Override
+    public MinecraftSession authenticate() throws AuthException {
+        emit(new AuthenticationStartedEvent());
+        try {
+            MicrosoftDeviceCode deviceCode = microsoftDeviceCodeService.requestDeviceCode(AuthConfig.getClientId());
+            emit(new DeviceCodeRequestedEvent(
+                    deviceCode.userCode(),
+                    URI.create(deviceCode.verificationUri()),
+                    deviceCode.verificationUriComplete() != null ? URI.create(deviceCode.verificationUriComplete()) : null,
+                    deviceCode.expiresIn(),
+                    deviceCode.interval(),
+                    deviceCode.message()
+            ));
+            openBrowser(URI.create(deviceCode.verificationUri()));
+            emit(new DeviceCodePollingStartedEvent(deviceCode.userCode(), deviceCode.interval(), deviceCode.expiresIn()));
+            MicrosoftTokenSet microsoftToken = microsoftDeviceCodeService.awaitToken(
+                    AuthConfig.getClientId(),
+                    deviceCode,
+                    this::emit
+            );
+            emit(new DeviceCodeSucceededEvent(
+                    microsoftToken.expiresIn(),
+                    microsoftToken.tokenType(),
+                    microsoftToken.scope()
+            ));
+            emit(new MicrosoftLoginSucceededEvent());
+
+            emit(new XboxAuthStartedEvent());
+            XboxToken xboxToken = xboxAuthenticationService.authenticate(microsoftToken.accessToken());
+            XstsToken xstsToken = xstsAuthorizationService.authorize(xboxToken);
+            MinecraftAccessToken minecraftToken = minecraftAuthenticationService.authenticate(xstsToken);
+            MinecraftProfile profile = minecraftProfileLookupService.lookupProfile(minecraftToken);
+            emit(new MinecraftProfileFetchedEvent(profile.name(), profile.id()));
+            emit(new AuthenticationSucceededEvent(profile.name(), profile.id()));
+
+            return new MinecraftSession(profile, minecraftToken.accessToken(), microsoftToken.refreshToken());
+        } catch (RuntimeException exception) {
+            emit(new AuthenticationFailedEvent(errorMessage(exception)));
+            throw exception;
+        }
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return true;
+    }
+
+    @Override
+    public String displayName() {
+        return "Device Code";
+    }
+
+    @Override
+    public EventStream eventStream() {
+        return this.eventStream;
+    }
+
+    private void openBrowser(URI uri) {
+        emit(new OpeningBrowserEvent());
+        browserOpener.open(uri);
+    }
+
+    private void emit(AuthEvent event) {
+        if (event != null && this.eventStream != null) {
+            this.eventStream.emit(event);
+        }
+    }
+
+    private String errorMessage(Throwable throwable) {
+        if (throwable == null || throwable.getMessage() == null || throwable.getMessage().isBlank())
+            return "Authentication failed.";
+
+        return throwable.getMessage();
+    }
+}

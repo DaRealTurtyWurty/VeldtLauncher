@@ -1,4 +1,4 @@
-package dev.turtywurty.veldtlauncher.auth;
+package dev.turtywurty.veldtlauncher.auth.session;
 
 import dev.turtywurty.veldtlauncher.auth.pkce.minecraft.MinecraftProfile;
 

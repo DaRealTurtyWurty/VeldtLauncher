@@ -28,6 +28,11 @@ public record MicrosoftError(
     }
 
     public enum Type {
+        AUTHORIZATION_PENDING,
+        SLOW_DOWN,
+        AUTHORIZATION_DECLINED,
+        EXPIRED_TOKEN,
+        BAD_VERIFICATION_CODE,
         INVALID_REQUEST,
         INVALID_GRANT,
         UNAUTHORIZED_CLIENT,

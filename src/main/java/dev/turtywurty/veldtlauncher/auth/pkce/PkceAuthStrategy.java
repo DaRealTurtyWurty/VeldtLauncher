@@ -16,6 +16,7 @@ import dev.turtywurty.veldtlauncher.auth.pkce.xbox.XboxToken;
 import dev.turtywurty.veldtlauncher.auth.pkce.xbox.xsts.XstsAuthService;
 import dev.turtywurty.veldtlauncher.auth.pkce.xbox.xsts.XstsAuthorizationService;
 import dev.turtywurty.veldtlauncher.auth.pkce.xbox.xsts.XstsToken;
+import dev.turtywurty.veldtlauncher.auth.session.MinecraftSession;
 import dev.turtywurty.veldtlauncher.event.EventStream;
 
 import java.net.URI;
@@ -105,7 +106,7 @@ public class PkceAuthStrategy implements AuthStrategy {
             XboxToken xboxToken = xboxAuthenticationService.authenticate(microsoftToken.accessToken());
             XstsToken xstsToken = xstsAuthorizationService.authorize(xboxToken);
             MinecraftAccessToken minecraftToken = minecraftAuthenticationService.authenticate(xstsToken);
-            MinecraftProfile profile = minecraftProfileLookupService.getMinecraftProfile(minecraftToken);
+            MinecraftProfile profile = minecraftProfileLookupService.lookupProfile(minecraftToken);
             emit(new MinecraftProfileFetchedEvent(profile.name(), profile.id()));
             emit(new AuthenticationSucceededEvent(profile.name(), profile.id()));
 

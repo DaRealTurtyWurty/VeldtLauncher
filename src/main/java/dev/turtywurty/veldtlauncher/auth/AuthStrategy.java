@@ -1,5 +1,6 @@
 package dev.turtywurty.veldtlauncher.auth;
 
+import dev.turtywurty.veldtlauncher.auth.session.MinecraftSession;
 import dev.turtywurty.veldtlauncher.event.EventStream;
 
 public interface AuthStrategy {
