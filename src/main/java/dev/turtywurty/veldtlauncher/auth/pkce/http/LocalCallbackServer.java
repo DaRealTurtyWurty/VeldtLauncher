@@ -8,14 +8,18 @@ import java.util.function.Consumer;
 
 public class LocalCallbackServer implements CallbackServer {
     private final int port;
-    private final Javalin app;
+    private final String path;
 
-    private Consumer<AuthCallbackResult> callback;
+    private volatile Javalin app;
+    private volatile Consumer<AuthCallbackResult> callback;
 
     public LocalCallbackServer(int port, String path) {
         this.port = port;
+        this.path = normalizePath(path);
+    }
 
-        this.app = Javalin.create(config -> {
+    private Javalin createApp() {
+        return Javalin.create(config -> {
             config.startup.showJavalinBanner = false;
             config.startup.showOldJavalinVersionWarning = false;
 
@@ -42,6 +46,7 @@ public class LocalCallbackServer implements CallbackServer {
                     throw new UncheckedIOException("Failed to flush authentication callback response.", exception);
                 }
 
+                Consumer<AuthCallbackResult> callback = this.callback;
                 if (callback != null) {
                     Thread.startVirtualThread(() -> callback.accept(result));
                 }
@@ -54,29 +59,40 @@ public class LocalCallbackServer implements CallbackServer {
     }
 
     @Override
-    public void start(Consumer<AuthCallbackResult> callback) {
-        if (this.app.jettyServer().started()) {
-            this.app.stop();
-        }
-
+    public synchronized void start(Consumer<AuthCallbackResult> callback) {
+        stop();
         this.callback = callback;
-        this.app.start(port);
+        Javalin app = createApp();
+        this.app = app;
+        app.start(port);
     }
 
     @Override
-    public void stop() {
+    public synchronized void stop() {
         this.callback = null;
-        this.app.stop();
+        Javalin app = this.app;
+        this.app = null;
+        if (app != null) {
+            app.stop();
+        }
     }
 
     @Override
     public boolean isSupported() {
         try {
-            this.app.jettyServer().start();
-            this.app.jettyServer().stop();
+            Javalin app = createApp();
+            app.start(port);
+            app.stop();
             return true;
         } catch (Exception _) {
             return false;
         }
+    }
+
+    private static String normalizePath(String path) {
+        if (path == null || path.isBlank())
+            throw new IllegalArgumentException("Callback path must not be blank.");
+
+        return path.startsWith("/") ? path : "/" + path;
     }
 }

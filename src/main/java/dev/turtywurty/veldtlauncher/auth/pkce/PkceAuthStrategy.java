@@ -87,12 +87,7 @@ public class PkceAuthStrategy implements AuthStrategy {
 
             CompletableFuture<AuthCallbackResult> callbackResultFuture = startCallbackServer();
             emit(new CallbackServerStartedEvent(redirectUri));
-            try {
-                openBrowser(authUri);
-            } catch (AuthException exception) {
-                callbackServer.stop();
-                throw exception;
-            }
+            openBrowser(authUri);
 
             emit(new WaitingForCallbackEvent());
             AuthCallbackResult callbackResult = waitForAuthorizationCallback(callbackResultFuture);
@@ -118,6 +113,8 @@ public class PkceAuthStrategy implements AuthStrategy {
         } catch (RuntimeException exception) {
             emit(new AuthenticationFailedEvent(errorMessage(exception)));
             throw exception;
+        } finally {
+            callbackServer.stop();
         }
     }
 
@@ -139,8 +136,6 @@ public class PkceAuthStrategy implements AuthStrategy {
             throw new AuthException("An error occurred while waiting for authorization callback.", exception.getCause());
         } catch (CancellationException exception) {
             throw new AuthException("Authorization callback was cancelled.", exception);
-        } finally {
-            callbackServer.stop();
         }
     }
 
