@@ -108,7 +108,14 @@ public class DeviceCodeAuthStrategy implements AuthStrategy {
             emit(new MinecraftProfileFetchedEvent(profile.name(), profile.id()));
             emit(new AuthenticationSucceededEvent(profile.name(), profile.id()));
 
-            this.sessionStore.save(new StoredSessionMetadata(profile.id(), profile.name(), System.currentTimeMillis() + (minecraftToken.expiresIn() * 1000L), minecraftToken.username()));
+            long now = System.currentTimeMillis();
+            this.sessionStore.save(new StoredSessionMetadata(
+                    profile.id(),
+                    profile.name(),
+                    now + (minecraftToken.expiresIn() * 1000L),
+                    minecraftToken.username(),
+                    now
+            ));
             this.sessionStore.setLastSession(profile.id());
 
             this.secretStore.save("profile:" + profile.id() + ":microsoft_refresh_token", microsoftToken.refreshToken());

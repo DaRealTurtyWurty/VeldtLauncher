@@ -75,12 +75,16 @@ public class JsonSessionStore implements SessionStore {
 
         try {
             SessionStoreState state = loadState();
-            boolean exists = state.sessions().stream()
+            long now = System.currentTimeMillis();
+            List<StoredSessionMetadata> updatedSessions = state.sessions().stream()
+                    .map(session -> userId.equals(session.userId()) ? touch(session, now) : session)
+                    .toList();
+            boolean exists = updatedSessions.stream()
                     .anyMatch(session -> userId.equals(session.userId()));
             if (!exists)
                 return;
 
-            writeState(new SessionStoreState(state.sessions(), userId));
+            writeState(new SessionStoreState(updatedSessions, userId));
         } catch (Exception exception) {
             LOGGER.error("Failed to update last StoredSessionMetadata entry in file: {}", this.path, exception);
         }
@@ -186,6 +190,19 @@ public class JsonSessionStore implements SessionStore {
         return left != null
                 && right != null
                 && Objects.equals(left.userId(), right.userId());
+    }
+
+    private StoredSessionMetadata touch(StoredSessionMetadata session, long timestamp) {
+        if (session == null)
+            return null;
+
+        return new StoredSessionMetadata(
+                session.userId(),
+                session.username(),
+                session.expiresAt(),
+                session.accountId(),
+                timestamp
+        );
     }
 
     private boolean containsUser(List<StoredSessionMetadata> sessions, String userId) {

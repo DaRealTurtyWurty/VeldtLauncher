@@ -3,22 +3,29 @@ package dev.turtywurty.veldtlauncher.ui;
 import dev.turtywurty.veldtlauncher.auth.AuthStrategy;
 import dev.turtywurty.veldtlauncher.auth.devicecode.DeviceCodeAuthStrategy;
 import dev.turtywurty.veldtlauncher.auth.pkce.PkceAuthStrategy;
+import dev.turtywurty.veldtlauncher.event.EventStream;
 import dev.turtywurty.veldtlauncher.event.SimpleEventStream;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import org.kordamp.ikonli.fontawesome6.FontAwesomeBrands;
+import org.kordamp.ikonli.fontawesome6.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Objects;
 
 public class AuthenticatePane extends AnchorPane {
     public AuthenticatePane() {
+        this(null);
+    }
+
+    public AuthenticatePane(Runnable onBack) {
         super();
         getStylesheets().add(Objects.requireNonNull(
                 AuthenticatePane.class.getResource("authenticate-pane.css"),
@@ -62,12 +69,31 @@ public class AuthenticatePane extends AnchorPane {
         card.getChildren().addAll(title, description, button, havingTroubleSigningIn);
         content.getChildren().add(card);
 
+        var backIcon = new FontIcon(FontAwesomeSolid.ARROW_LEFT);
+        backIcon.getStyleClass().add("authenticate-back-icon");
+        var backButton = new Button("Back", backIcon);
+        backButton.getStyleClass().add("authenticate-back-button");
+        backButton.setOnAction(_ -> {
+            if (onBack != null) {
+                onBack.run();
+                return;
+            }
+
+            var scene = getScene();
+            if (scene != null) {
+                scene.setRoot(new PickAccountPane());
+            }
+        });
+        AnchorPane.setTopAnchor(backButton, 24.0);
+        AnchorPane.setLeftAnchor(backButton, 24.0);
+
         getChildren().add(content);
+        getChildren().add(backButton);
     }
 
     private void startAuthentication(AuthStrategy authStrategy) {
-        var eventStream = authStrategy.eventStream();
-        var scene = getScene();
+        EventStream eventStream = authStrategy.eventStream();
+        Scene scene = getScene();
         var processingPane = new AuthenticationProcessingPane(eventStream, () -> {
             if (scene != null) {
                 scene.setRoot(new AuthenticatePane());

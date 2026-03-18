@@ -1,8 +1,13 @@
 package dev.turtywurty.veldtlauncher.auth;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.URI;
 
 public final class AuthConfig {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthConfig.class);
+
     public static final String DEFAULT_CLIENT_ID = "f37ef7fd-1d43-47e2-84dd-3206110d3b57";
     public static final String DEFAULT_REDIRECT_URI_PATH = "oauth/callback";
     public static final int DEFAULT_REDIRECT_URI_PORT = 43675;
@@ -21,7 +26,7 @@ public final class AuthConfig {
             try {
                 return Integer.parseInt(portStr);
             } catch (NumberFormatException _) {
-                System.err.println("Invalid port number in VELDT_AUTH_REDIRECT_URI_PORT: " + portStr + ". Falling back to default port " + DEFAULT_REDIRECT_URI_PORT);
+                LOGGER.error("Invalid port number in VELDT_AUTH_REDIRECT_URI_PORT: {}. Falling back to default port {}", portStr, DEFAULT_REDIRECT_URI_PORT);
             }
         }
 

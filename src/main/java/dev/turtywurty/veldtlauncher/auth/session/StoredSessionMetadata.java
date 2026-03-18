@@ -4,6 +4,7 @@ public record StoredSessionMetadata(
         String userId,
         String username,
         long expiresAt,
-        String accountId
+        String accountId,
+        long lastAccessedAt
 ) {
 }
