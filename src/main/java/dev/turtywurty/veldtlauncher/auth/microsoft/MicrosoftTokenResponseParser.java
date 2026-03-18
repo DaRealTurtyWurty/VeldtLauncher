@@ -1,50 +1,48 @@
-package dev.turtywurty.veldtlauncher.auth.devicecode;
+package dev.turtywurty.veldtlauncher.auth.microsoft;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import dev.turtywurty.veldtlauncher.auth.AuthException;
-import dev.turtywurty.veldtlauncher.auth.microsoft.MicrosoftError;
 
-public final class MicrosoftDeviceCodeResponseParser {
+public final class MicrosoftTokenResponseParser {
     private static final Gson GSON = new Gson();
 
-    private MicrosoftDeviceCodeResponseParser() {
+    private MicrosoftTokenResponseParser() {
     }
 
-    public static MicrosoftDeviceCodeResponse parse(String json) throws AuthException {
+    public static MicrosoftTokenResponse parse(String json) throws AuthException {
         if (json == null || json.isBlank())
-            throw new AuthException("Response body from Microsoft device code endpoint was empty.");
+            throw new AuthException("Response body from Microsoft token endpoint was empty.");
 
         final JsonObject jsonObject;
         try {
             jsonObject = GSON.fromJson(json, JsonObject.class);
         } catch (JsonParseException exception) {
-            throw new AuthException("Failed to parse Microsoft device code response JSON.", exception);
+            throw new AuthException("Failed to parse Microsoft token response JSON.", exception);
         }
 
         if (jsonObject == null)
-            throw new AuthException("Microsoft device code response JSON was null.");
+            throw new AuthException("Microsoft token response JSON was null.");
 
         if (jsonObject.has("error")) {
             MicrosoftError error = parseError(jsonObject);
-            return MicrosoftDeviceCodeResponse.error(error);
+            return MicrosoftTokenResponse.error(error);
         }
 
         try {
-            MicrosoftDeviceCode deviceCode = new MicrosoftDeviceCode(
-                    getString(jsonObject, "device_code"),
-                    getString(jsonObject, "user_code"),
-                    getString(jsonObject, "verification_uri"),
-                    getString(jsonObject, "verification_uri_complete"),
+            MicrosoftTokenSet tokenSet = new MicrosoftTokenSet(
+                    getString(jsonObject, "access_token"),
+                    getString(jsonObject, "refresh_token"),
                     getLong(jsonObject, "expires_in"),
-                    getLong(jsonObject, "interval"),
-                    getString(jsonObject, "message")
+                    getString(jsonObject, "token_type"),
+                    getString(jsonObject, "scope"),
+                    getString(jsonObject, "id_token")
             );
-            return MicrosoftDeviceCodeResponse.success(deviceCode);
+            return MicrosoftTokenResponse.success(tokenSet);
         } catch (RuntimeException exception) {
-            throw new AuthException("Failed to parse Microsoft device code response.", exception);
+            throw new AuthException("Failed to parse Microsoft token set.", exception);
         }
     }
 

@@ -1,6 +1,6 @@
 package dev.turtywurty.veldtlauncher.auth.session;
 
-import dev.turtywurty.veldtlauncher.auth.pkce.minecraft.MinecraftProfile;
+import dev.turtywurty.veldtlauncher.auth.minecraft.MinecraftProfile;
 
 public record MinecraftSession(
         MinecraftProfile profile,

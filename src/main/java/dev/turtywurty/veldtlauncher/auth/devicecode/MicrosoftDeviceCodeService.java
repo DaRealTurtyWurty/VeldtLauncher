@@ -1,7 +1,7 @@
 package dev.turtywurty.veldtlauncher.auth.devicecode;
 
 import dev.turtywurty.veldtlauncher.auth.AuthEvent;
-import dev.turtywurty.veldtlauncher.auth.pkce.microsoft.MicrosoftTokenSet;
+import dev.turtywurty.veldtlauncher.auth.microsoft.MicrosoftTokenSet;
 
 import java.util.List;
 import java.util.function.Consumer;

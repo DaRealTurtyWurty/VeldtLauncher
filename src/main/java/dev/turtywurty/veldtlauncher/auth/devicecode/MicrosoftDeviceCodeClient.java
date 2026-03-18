@@ -4,10 +4,10 @@ import dev.turtywurty.veldtlauncher.auth.AuthException;
 import dev.turtywurty.veldtlauncher.auth.AuthEvent;
 import dev.turtywurty.veldtlauncher.auth.devicecode.event.DeviceCodeAuthorizationDeclinedEvent;
 import dev.turtywurty.veldtlauncher.auth.devicecode.event.DeviceCodeAuthorizationPendingEvent;
-import dev.turtywurty.veldtlauncher.auth.pkce.microsoft.MicrosoftError;
-import dev.turtywurty.veldtlauncher.auth.pkce.microsoft.MicrosoftTokenResponse;
-import dev.turtywurty.veldtlauncher.auth.pkce.microsoft.MicrosoftTokenResponseParser;
-import dev.turtywurty.veldtlauncher.auth.pkce.microsoft.MicrosoftTokenSet;
+import dev.turtywurty.veldtlauncher.auth.microsoft.MicrosoftError;
+import dev.turtywurty.veldtlauncher.auth.microsoft.MicrosoftTokenResponse;
+import dev.turtywurty.veldtlauncher.auth.microsoft.MicrosoftTokenResponseParser;
+import dev.turtywurty.veldtlauncher.auth.microsoft.MicrosoftTokenSet;
 
 import java.io.IOException;
 import java.net.http.HttpClient;

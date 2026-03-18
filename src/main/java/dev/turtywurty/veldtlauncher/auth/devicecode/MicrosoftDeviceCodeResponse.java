@@ -1,6 +1,6 @@
 package dev.turtywurty.veldtlauncher.auth.devicecode;
 
-import dev.turtywurty.veldtlauncher.auth.pkce.microsoft.MicrosoftError;
+import dev.turtywurty.veldtlauncher.auth.microsoft.MicrosoftError;
 
 public record MicrosoftDeviceCodeResponse(
         MicrosoftDeviceCode deviceCode,

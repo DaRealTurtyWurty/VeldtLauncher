@@ -9,7 +9,6 @@ module dev.turtywurty.veldtlauncher {
     requires static org.jetbrains.annotations;
     requires com.google.gson;
     requires java.keyring;
-    requires jcef;
 
     exports dev.turtywurty.veldtlauncher;
 }
