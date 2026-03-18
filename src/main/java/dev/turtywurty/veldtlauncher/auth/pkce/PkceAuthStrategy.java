@@ -1,6 +1,9 @@
 package dev.turtywurty.veldtlauncher.auth.pkce;
 
-import dev.turtywurty.veldtlauncher.auth.*;
+import dev.turtywurty.veldtlauncher.auth.AuthConfig;
+import dev.turtywurty.veldtlauncher.auth.AuthEvent;
+import dev.turtywurty.veldtlauncher.auth.AuthException;
+import dev.turtywurty.veldtlauncher.auth.AuthStrategy;
 import dev.turtywurty.veldtlauncher.auth.pkce.event.*;
 import dev.turtywurty.veldtlauncher.auth.pkce.http.AuthCallbackResult;
 import dev.turtywurty.veldtlauncher.auth.pkce.http.AuthorizationRequestBuilder;
@@ -16,7 +19,7 @@ import dev.turtywurty.veldtlauncher.auth.pkce.xbox.XboxToken;
 import dev.turtywurty.veldtlauncher.auth.pkce.xbox.xsts.XstsAuthService;
 import dev.turtywurty.veldtlauncher.auth.pkce.xbox.xsts.XstsAuthorizationService;
 import dev.turtywurty.veldtlauncher.auth.pkce.xbox.xsts.XstsToken;
-import dev.turtywurty.veldtlauncher.auth.session.MinecraftSession;
+import dev.turtywurty.veldtlauncher.auth.session.*;
 import dev.turtywurty.veldtlauncher.event.EventStream;
 
 import java.net.URI;
@@ -34,6 +37,8 @@ public class PkceAuthStrategy implements AuthStrategy {
     private final XstsAuthorizationService xstsAuthorizationService;
     private final MinecraftAuthenticationService minecraftAuthenticationService;
     private final MinecraftProfileLookupService minecraftProfileLookupService;
+    private final SessionStore sessionStore;
+    private final SecretStore secretStore;
 
     public PkceAuthStrategy(EventStream eventStream) {
         this(
@@ -46,7 +51,9 @@ public class PkceAuthStrategy implements AuthStrategy {
                 new XboxAuthService(),
                 new XstsAuthService(),
                 new MinecraftAuthService(),
-                new MinecraftProfileService()
+                new MinecraftProfileService(),
+                JsonSessionStore.INSTANCE,
+                OSCredentialSecretStore.INSTANCE
         );
     }
 
@@ -60,7 +67,9 @@ public class PkceAuthStrategy implements AuthStrategy {
             XboxAuthenticationService xboxAuthenticationService,
             XstsAuthorizationService xstsAuthorizationService,
             MinecraftAuthenticationService minecraftAuthenticationService,
-            MinecraftProfileLookupService minecraftProfileLookupService
+            MinecraftProfileLookupService minecraftProfileLookupService,
+            SessionStore sessionStore,
+            SecretStore secretStore
     ) {
         this.eventStream = eventStream;
         this.pkceValuesProvider = Objects.requireNonNull(pkceValuesProvider, "pkceValuesProvider");
@@ -72,6 +81,8 @@ public class PkceAuthStrategy implements AuthStrategy {
         this.xstsAuthorizationService = Objects.requireNonNull(xstsAuthorizationService, "xstsAuthorizationService");
         this.minecraftAuthenticationService = Objects.requireNonNull(minecraftAuthenticationService, "minecraftAuthenticationService");
         this.minecraftProfileLookupService = Objects.requireNonNull(minecraftProfileLookupService, "minecraftProfileLookupService");
+        this.sessionStore = Objects.requireNonNull(sessionStore, "sessionStore");
+        this.secretStore = Objects.requireNonNull(secretStore, "secretStore");
     }
 
     @Override
@@ -109,6 +120,13 @@ public class PkceAuthStrategy implements AuthStrategy {
             MinecraftProfile profile = minecraftProfileLookupService.lookupProfile(minecraftToken);
             emit(new MinecraftProfileFetchedEvent(profile.name(), profile.id()));
             emit(new AuthenticationSucceededEvent(profile.name(), profile.id()));
+
+            this.sessionStore.save(new StoredSessionMetadata(profile.id(), profile.name(), System.currentTimeMillis() + (minecraftToken.expiresIn() * 1000L), minecraftToken.username()));
+            this.sessionStore.setLastSession(profile.id());
+
+            this.secretStore.save("profile:" + profile.id() + ":microsoft_refresh_token", microsoftToken.refreshToken());
+            this.secretStore.save("profile:" + profile.id() + ":minecraft_access_token", minecraftToken.accessToken());
+            this.secretStore.save("profile:" + profile.id() + ":minecraft_access_token", minecraftToken.accessToken());
 
             return new MinecraftSession(profile, minecraftToken.accessToken(), microsoftToken.refreshToken());
         } catch (RuntimeException exception) {

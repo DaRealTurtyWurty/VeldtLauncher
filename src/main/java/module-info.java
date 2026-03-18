@@ -8,6 +8,8 @@ module dev.turtywurty.veldtlauncher {
     requires java.net.http;
     requires static org.jetbrains.annotations;
     requires com.google.gson;
+    requires java.keyring;
+    requires jcef;
 
     exports dev.turtywurty.veldtlauncher;
 }

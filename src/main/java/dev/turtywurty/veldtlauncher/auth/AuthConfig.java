@@ -12,16 +12,16 @@ public final class AuthConfig {
     }
 
     public static String getClientId() {
-        return System.getenv().getOrDefault("AUTH_CLIENT_ID", DEFAULT_CLIENT_ID);
+        return System.getenv().getOrDefault("VELDT_AUTH_CLIENT_ID", DEFAULT_CLIENT_ID);
     }
 
     public static int getRedirectUriPort() {
-        String portStr = System.getenv("AUTH_REDIRECT_URI_PORT");
+        String portStr = System.getenv("VELDT_AUTH_REDIRECT_URI_PORT");
         if (portStr != null) {
             try {
                 return Integer.parseInt(portStr);
             } catch (NumberFormatException _) {
-                System.err.println("Invalid port number in AUTH_REDIRECT_URI_PORT: " + portStr + ". Falling back to default port " + DEFAULT_REDIRECT_URI_PORT);
+                System.err.println("Invalid port number in VELDT_AUTH_REDIRECT_URI_PORT: " + portStr + ". Falling back to default port " + DEFAULT_REDIRECT_URI_PORT);
             }
         }
 
@@ -29,7 +29,7 @@ public final class AuthConfig {
     }
 
     public static String getRedirectUriPath() {
-        return System.getenv().getOrDefault("AUTH_REDIRECT_URI_PATH", DEFAULT_REDIRECT_URI_PATH);
+        return System.getenv().getOrDefault("VELDT_AUTH_REDIRECT_URI_PATH", DEFAULT_REDIRECT_URI_PATH);
     }
 
     public static URI getRedirectUri() {

@@ -31,6 +31,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
@@ -121,8 +122,8 @@ public class AuthenticationProcessingPane extends AnchorPane {
             }
         });
 
-        HBox.setHgrow(deviceCodeField, javafx.scene.layout.Priority.ALWAYS);
-        HBox.setHgrow(verificationUriField, javafx.scene.layout.Priority.ALWAYS);
+        HBox.setHgrow(deviceCodeField, Priority.ALWAYS);
+        HBox.setHgrow(verificationUriField, Priority.ALWAYS);
 
         card.getChildren().addAll(indicator, title, status, details, deviceCodeRow, verificationUriRow, backButton);
         content.getChildren().add(card);

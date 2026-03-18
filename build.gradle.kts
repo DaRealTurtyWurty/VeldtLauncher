@@ -41,6 +41,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.13.2")
     implementation("org.slf4j:slf4j-api:2.0.17")
     implementation("ch.qos.logback:logback-classic:1.5.32")
+    implementation("com.github.javakeyring:java-keyring:1.0.4")
     compileOnly("org.jetbrains:annotations:26.0.2")
 }
 
