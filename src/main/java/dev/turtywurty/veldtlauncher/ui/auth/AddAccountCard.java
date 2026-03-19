@@ -1,4 +1,4 @@
-package dev.turtywurty.veldtlauncher.ui;
+package dev.turtywurty.veldtlauncher.ui.auth;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;

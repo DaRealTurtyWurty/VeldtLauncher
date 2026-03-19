@@ -1,4 +1,4 @@
-package dev.turtywurty.veldtlauncher.ui;
+package dev.turtywurty.veldtlauncher.ui.auth;
 
 import dev.turtywurty.veldtlauncher.auth.session.StoredSessionMetadata;
 import javafx.geometry.Pos;

@@ -1,7 +1,6 @@
 package dev.turtywurty.veldtlauncher;
 
-import dev.turtywurty.veldtlauncher.ui.AuthenticatePane;
-import dev.turtywurty.veldtlauncher.ui.PickAccountPane;
+import dev.turtywurty.veldtlauncher.ui.auth.PickAccountPane;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;

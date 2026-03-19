@@ -1,4 +1,4 @@
-package dev.turtywurty.veldtlauncher.ui;
+package dev.turtywurty.veldtlauncher.ui.auth;
 
 import dev.turtywurty.veldtlauncher.auth.session.JsonSessionStore;
 import dev.turtywurty.veldtlauncher.auth.session.StoredSessionMetadata;
@@ -35,7 +35,7 @@ public class PickAccountPane extends AnchorPane {
 
     public PickAccountPane() {
         getStylesheets().add(Objects.requireNonNull(
-                PickAccountPane.class.getResource("pick-account-pane.css"),
+                PickAccountPane.class.getResource("/dev/turtywurty/veldtlauncher/ui/pick-account-pane.css"),
                 "Missing stylesheet: pick-account-pane.css"
         ).toExternalForm());
         getStyleClass().add("pick-account-pane");

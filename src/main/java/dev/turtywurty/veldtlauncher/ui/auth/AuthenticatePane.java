@@ -1,4 +1,4 @@
-package dev.turtywurty.veldtlauncher.ui;
+package dev.turtywurty.veldtlauncher.ui.auth;
 
 import dev.turtywurty.veldtlauncher.auth.AuthStrategy;
 import dev.turtywurty.veldtlauncher.auth.devicecode.DeviceCodeAuthStrategy;
@@ -28,7 +28,7 @@ public class AuthenticatePane extends AnchorPane {
     public AuthenticatePane(Runnable onBack) {
         super();
         getStylesheets().add(Objects.requireNonNull(
-                AuthenticatePane.class.getResource("authenticate-pane.css"),
+                AuthenticatePane.class.getResource("/dev/turtywurty/veldtlauncher/ui/authenticate-pane.css"),
                 "Missing stylesheet: authenticate-pane.css"
         ).toExternalForm());
         getStyleClass().add("authenticate-pane");

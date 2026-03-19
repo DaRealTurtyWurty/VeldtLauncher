@@ -1,4 +1,4 @@
-package dev.turtywurty.veldtlauncher.ui;
+package dev.turtywurty.veldtlauncher.ui.auth;
 
 import dev.turtywurty.veldtlauncher.auth.AuthEvent;
 import dev.turtywurty.veldtlauncher.auth.devicecode.event.DeviceCodeAuthorizationDeclinedEvent;
@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class AuthenticationProcessingPane extends AnchorPane {
     public AuthenticationProcessingPane(EventStream eventStream, Runnable onBack) {
         getStylesheets().add(Objects.requireNonNull(
-                AuthenticationProcessingPane.class.getResource("authenticate-processing-pane.css"),
+                AuthenticationProcessingPane.class.getResource("/dev/turtywurty/veldtlauncher/ui/authenticate-processing-pane.css"),
                 "Missing stylesheet: authenticate-processing-pane.css"
         ).toExternalForm());
 
