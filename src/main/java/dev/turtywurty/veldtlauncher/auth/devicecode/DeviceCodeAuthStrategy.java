@@ -4,14 +4,18 @@ import dev.turtywurty.veldtlauncher.auth.AuthConfig;
 import dev.turtywurty.veldtlauncher.auth.AuthEvent;
 import dev.turtywurty.veldtlauncher.auth.AuthException;
 import dev.turtywurty.veldtlauncher.auth.AuthStrategy;
+import dev.turtywurty.veldtlauncher.auth.browser.BrowserOpener;
+import dev.turtywurty.veldtlauncher.auth.browser.DesktopBrowserOpener;
 import dev.turtywurty.veldtlauncher.auth.devicecode.event.DeviceCodePollingStartedEvent;
 import dev.turtywurty.veldtlauncher.auth.devicecode.event.DeviceCodeRequestedEvent;
 import dev.turtywurty.veldtlauncher.auth.devicecode.event.DeviceCodeSucceededEvent;
-import dev.turtywurty.veldtlauncher.auth.browser.BrowserOpener;
-import dev.turtywurty.veldtlauncher.auth.browser.DesktopBrowserOpener;
 import dev.turtywurty.veldtlauncher.auth.event.*;
 import dev.turtywurty.veldtlauncher.auth.microsoft.MicrosoftTokenSet;
 import dev.turtywurty.veldtlauncher.auth.minecraft.*;
+import dev.turtywurty.veldtlauncher.auth.session.JsonSessionStore;
+import dev.turtywurty.veldtlauncher.auth.session.MinecraftSession;
+import dev.turtywurty.veldtlauncher.auth.session.SessionStore;
+import dev.turtywurty.veldtlauncher.auth.session.StoredSessionMetadata;
 import dev.turtywurty.veldtlauncher.auth.session.secret.OSCredentialSecretStore;
 import dev.turtywurty.veldtlauncher.auth.session.secret.SecretStore;
 import dev.turtywurty.veldtlauncher.auth.xbox.XboxAuthService;
@@ -20,13 +24,16 @@ import dev.turtywurty.veldtlauncher.auth.xbox.XboxToken;
 import dev.turtywurty.veldtlauncher.auth.xbox.xsts.XstsAuthService;
 import dev.turtywurty.veldtlauncher.auth.xbox.xsts.XstsAuthorizationService;
 import dev.turtywurty.veldtlauncher.auth.xbox.xsts.XstsToken;
-import dev.turtywurty.veldtlauncher.auth.session.*;
 import dev.turtywurty.veldtlauncher.event.EventStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.Objects;
 
 public class DeviceCodeAuthStrategy implements AuthStrategy {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeviceCodeAuthStrategy.class);
+
     private final EventStream eventStream;
     private final BrowserOpener browserOpener;
     private final MicrosoftDeviceCodeService microsoftDeviceCodeService;
@@ -158,6 +165,8 @@ public class DeviceCodeAuthStrategy implements AuthStrategy {
     private String errorMessage(Throwable throwable) {
         if (throwable == null || throwable.getMessage() == null || throwable.getMessage().isBlank())
             return "Authentication failed.";
+
+        LOGGER.error("Authentication error", throwable);
 
         return throwable.getMessage();
     }

@@ -27,12 +27,16 @@ import dev.turtywurty.veldtlauncher.auth.xbox.xsts.XstsAuthorizationService;
 import dev.turtywurty.veldtlauncher.auth.xbox.xsts.XstsToken;
 import dev.turtywurty.veldtlauncher.auth.session.*;
 import dev.turtywurty.veldtlauncher.event.EventStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.Objects;
 import java.util.concurrent.*;
 
 public class PkceAuthStrategy implements AuthStrategy {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PkceAuthStrategy.class);
+
     private final EventStream eventStream;
     private final PkceValuesProvider pkceValuesProvider;
     private final StateProvider stateProvider;
@@ -185,6 +189,8 @@ public class PkceAuthStrategy implements AuthStrategy {
     private String errorMessage(Throwable throwable) {
         if (throwable == null || throwable.getMessage() == null || throwable.getMessage().isBlank())
             return "Authentication failed.";
+
+        LOGGER.error("Authentication error", throwable);
 
         return throwable.getMessage();
     }

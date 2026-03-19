@@ -1,5 +1,5 @@
 .authentication-processing-pane {
-    -fx-background-color: #0d1321;
+    -fx-background-color: #101010;
 }
 
 .authenticate-processing-content {
@@ -7,9 +7,9 @@
 }
 
 .authentication-processing-card {
-    -fx-background-color: rgba(18, 28, 44, 0.96);
+    -fx-background-color: rgba(24, 24, 24, 0.96);
     -fx-background-radius: 28;
-    -fx-border-color: rgba(154, 205, 255, 0.18);
+    -fx-border-color: rgba(255, 255, 255, 0.10);
     -fx-border-radius: 28;
     -fx-border-width: 1;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 32, 0.18, 0, 14);
@@ -18,7 +18,7 @@
 }
 
 .authentication-progress-indicator {
-    -fx-progress-color: #2f80ed;
+    -fx-progress-color: #7a7a7a;
 }
 
 .authentication-progress-indicator-failed {
@@ -26,7 +26,7 @@
 }
 
 .authentication-processing-title {
-    -fx-fill: #f4f9ff;
+    -fx-fill: #f1f1f1;
     -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
     -fx-font-size: 30px;
     -fx-font-weight: 800;
@@ -34,7 +34,7 @@
 }
 
 .authentication-processing-status {
-    -fx-fill: #dbe9ff;
+    -fx-fill: #e0e0e0;
     -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
     -fx-font-size: 15px;
     -fx-font-weight: 700;
@@ -42,7 +42,7 @@
 }
 
 .authentication-processing-details {
-    -fx-fill: rgba(231, 240, 255, 0.74);
+    -fx-fill: rgba(235, 235, 235, 0.68);
     -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
     -fx-font-size: 14px;
     -fx-line-spacing: 3px;
@@ -50,18 +50,18 @@
 }
 
 .authentication-processing-copy-field {
-    -fx-background-color: rgba(10, 16, 28, 0.82);
+    -fx-background-color: rgba(16, 16, 16, 0.9);
     -fx-background-insets: 0;
     -fx-background-radius: 14;
-    -fx-border-color: rgba(154, 205, 255, 0.22);
+    -fx-border-color: rgba(255, 255, 255, 0.10);
     -fx-border-radius: 14;
     -fx-border-width: 1;
     -fx-font-family: "Consolas", "Cascadia Code", monospace;
     -fx-font-size: 14px;
-    -fx-highlight-fill: rgba(47, 128, 237, 0.45);
-    -fx-highlight-text-fill: #f4f9ff;
+    -fx-highlight-fill: rgba(120, 120, 120, 0.45);
+    -fx-highlight-text-fill: #f1f1f1;
     -fx-padding: 8 12 8 12;
-    -fx-text-fill: #f4f9ff;
+    -fx-text-fill: #f1f1f1;
 }
 
 .authentication-processing-copy-field .text {
@@ -73,9 +73,9 @@
 }
 
 .authentication-processing-copy-button {
-    -fx-background-color: rgba(47, 128, 237, 0.14);
+    -fx-background-color: rgba(255, 255, 255, 0.06);
     -fx-background-radius: 12;
-    -fx-border-color: rgba(154, 205, 255, 0.24);
+    -fx-border-color: rgba(255, 255, 255, 0.10);
     -fx-border-radius: 12;
     -fx-border-width: 1;
     -fx-cursor: hand;
@@ -83,17 +83,17 @@
     -fx-font-size: 13px;
     -fx-font-weight: 700;
     -fx-padding: 10 14 10 14;
-    -fx-text-fill: #dbe9ff;
+    -fx-text-fill: #e0e0e0;
 }
 
 .authentication-processing-copy-button:hover {
-    -fx-background-color: rgba(47, 128, 237, 0.22);
+    -fx-background-color: rgba(255, 255, 255, 0.10);
 }
 
 .authentication-processing-back-button {
     -fx-background-color: transparent;
     -fx-background-radius: 14;
-    -fx-border-color: rgba(154, 205, 255, 0.22);
+    -fx-border-color: rgba(255, 255, 255, 0.10);
     -fx-border-radius: 14;
     -fx-border-width: 1;
     -fx-cursor: hand;
@@ -101,7 +101,7 @@
     -fx-font-size: 14px;
     -fx-font-weight: 700;
     -fx-padding: 10 16 10 16;
-    -fx-text-fill: #dbe9ff;
+    -fx-text-fill: #e0e0e0;
 }
 
 .authentication-processing-back-button:hover {

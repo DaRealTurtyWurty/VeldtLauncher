@@ -5,6 +5,8 @@ import dev.turtywurty.veldtlauncher.auth.devicecode.DeviceCodeAuthStrategy;
 import dev.turtywurty.veldtlauncher.auth.pkce.PkceAuthStrategy;
 import dev.turtywurty.veldtlauncher.event.EventStream;
 import dev.turtywurty.veldtlauncher.event.SimpleEventStream;
+import dev.turtywurty.veldtlauncher.ui.Stylesheets;
+import dev.turtywurty.veldtlauncher.ui.WindowChrome;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -12,13 +14,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import org.kordamp.ikonli.fontawesome6.FontAwesomeBrands;
 import org.kordamp.ikonli.fontawesome6.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
-
-import java.util.Objects;
 
 public class AuthenticatePane extends AnchorPane {
     public AuthenticatePane() {
@@ -27,10 +28,7 @@ public class AuthenticatePane extends AnchorPane {
 
     public AuthenticatePane(Runnable onBack) {
         super();
-        getStylesheets().add(Objects.requireNonNull(
-                AuthenticatePane.class.getResource("/dev/turtywurty/veldtlauncher/ui/authenticate-pane.css"),
-                "Missing stylesheet: authenticate-pane.css"
-        ).toExternalForm());
+        Stylesheets.addAll(this, "authenticate-pane.css", "shared-controls.css");
         getStyleClass().add("authenticate-pane");
 
         var content = new VBox();
@@ -70,9 +68,9 @@ public class AuthenticatePane extends AnchorPane {
         content.getChildren().add(card);
 
         var backIcon = new FontIcon(FontAwesomeSolid.ARROW_LEFT);
-        backIcon.getStyleClass().add("authenticate-back-icon");
+        backIcon.getStyleClass().add("veldt-back-icon");
         var backButton = new Button("Back", backIcon);
-        backButton.getStyleClass().add("authenticate-back-button");
+        backButton.getStyleClass().add("veldt-back-button");
         backButton.setOnAction(_ -> {
             if (onBack != null) {
                 onBack.run();
@@ -87,7 +85,16 @@ public class AuthenticatePane extends AnchorPane {
         AnchorPane.setTopAnchor(backButton, 24.0);
         AnchorPane.setLeftAnchor(backButton, 24.0);
 
+        var windowBar = new HBox(WindowChrome.createWindowControls(this));
+        windowBar.setAlignment(Pos.CENTER_RIGHT);
+        windowBar.setPadding(new Insets(12, 12, 0, 12));
+        WindowChrome.installDragSupport(windowBar);
+        AnchorPane.setTopAnchor(windowBar, 0.0);
+        AnchorPane.setLeftAnchor(windowBar, 0.0);
+        AnchorPane.setRightAnchor(windowBar, 0.0);
+
         getChildren().add(content);
+        getChildren().add(windowBar);
         getChildren().add(backButton);
     }
 

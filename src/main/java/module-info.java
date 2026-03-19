@@ -11,4 +11,5 @@ module dev.turtywurty.veldtlauncher {
     requires java.keyring;
 
     exports dev.turtywurty.veldtlauncher;
+    opens dev.turtywurty.veldtlauncher.auth.session to com.google.gson;
 }

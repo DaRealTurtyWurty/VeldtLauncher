@@ -2,6 +2,9 @@ package dev.turtywurty.veldtlauncher.ui.auth;
 
 import dev.turtywurty.veldtlauncher.auth.session.JsonSessionStore;
 import dev.turtywurty.veldtlauncher.auth.session.StoredSessionMetadata;
+import dev.turtywurty.veldtlauncher.ui.Stylesheets;
+import dev.turtywurty.veldtlauncher.ui.WindowChrome;
+import dev.turtywurty.veldtlauncher.ui.dashboard.shell.DashboardShell;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
@@ -13,6 +16,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
@@ -34,10 +38,7 @@ public class PickAccountPane extends AnchorPane {
     private String selectedUserId;
 
     public PickAccountPane() {
-        getStylesheets().add(Objects.requireNonNull(
-                PickAccountPane.class.getResource("/dev/turtywurty/veldtlauncher/ui/pick-account-pane.css"),
-                "Missing stylesheet: pick-account-pane.css"
-        ).toExternalForm());
+        Stylesheets.addAll(this, "pick-account-pane.css", "shared-controls.css");
         getStyleClass().add("pick-account-pane");
 
         var content = new VBox();
@@ -65,6 +66,15 @@ public class PickAccountPane extends AnchorPane {
 
         content.getChildren().addAll(title, subtitle, this.accounts);
         getChildren().add(content);
+
+        var windowBar = new HBox(WindowChrome.createWindowControls(this));
+        windowBar.setAlignment(Pos.CENTER_RIGHT);
+        windowBar.setPadding(new Insets(12, 12, 0, 12));
+        WindowChrome.installDragSupport(windowBar);
+        AnchorPane.setTopAnchor(windowBar, 0.0);
+        AnchorPane.setLeftAnchor(windowBar, 0.0);
+        AnchorPane.setRightAnchor(windowBar, 0.0);
+        getChildren().add(windowBar);
 
         refreshAccounts();
     }
@@ -110,11 +120,19 @@ public class PickAccountPane extends AnchorPane {
     }
 
     private void selectAccount(StoredSessionMetadata session) {
-        if (session == null || session.userId() == null || session.userId().isBlank() || isSampleSession(session))
+        if (session == null || session.userId() == null || session.userId().isBlank())
             return;
 
-        JsonSessionStore.INSTANCE.setLastSession(session.userId());
+        if (!isSampleSession(session)) {
+            JsonSessionStore.INSTANCE.setLastSession(session.userId());
+        }
         this.selectedUserId = session.userId();
+        Scene scene = getScene();
+        if (scene != null) {
+            DashboardShell.show(scene);
+            return;
+        }
+
         renderAccounts();
     }
 

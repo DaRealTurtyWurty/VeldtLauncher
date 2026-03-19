@@ -1,6 +1,7 @@
 package dev.turtywurty.veldtlauncher.auth.minecraft;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -70,8 +71,8 @@ public final class MinecraftProfileService implements MinecraftProfileLookupServ
             profile = new MinecraftProfile(
                     getString(jsonObject, "id"),
                     getString(jsonObject, "name"),
-                    getArray(jsonObject, "skins", MinecraftProfile.Skin[].class),
-                    getArray(jsonObject, "capes", MinecraftProfile.Cape[].class)
+                    getSkins(jsonObject, "skins"),
+                    getCapes(jsonObject, "capes")
             );
         } catch (RuntimeException exception) {
             throw new AuthException("Failed to parse Minecraft profile response.", exception);
@@ -160,10 +161,45 @@ public final class MinecraftProfileService implements MinecraftProfileLookupServ
         return element.getAsString();
     }
 
-    private <T> T getArray(JsonObject jsonObject, String fieldName, Class<T> type) {
-        if (!jsonObject.has(fieldName) || !jsonObject.get(fieldName).isJsonArray())
-            return GSON.fromJson("[]", type);
+    private MinecraftProfile.Skin[] getSkins(JsonObject jsonObject, String fieldName) {
+        JsonArray array = getJsonArray(jsonObject, fieldName);
+        MinecraftProfile.Skin[] skins = new MinecraftProfile.Skin[array.size()];
 
-        return GSON.fromJson(jsonObject.get(fieldName), type);
+        for (int index = 0; index < array.size(); index++) {
+            JsonObject skinObject = array.get(index).getAsJsonObject();
+            skins[index] = new MinecraftProfile.Skin(
+                    getString(skinObject, "id"),
+                    getString(skinObject, "state"),
+                    getString(skinObject, "url"),
+                    getString(skinObject, "variant"),
+                    getString(skinObject, "alias")
+            );
+        }
+
+        return skins;
+    }
+
+    private MinecraftProfile.Cape[] getCapes(JsonObject jsonObject, String fieldName) {
+        JsonArray array = getJsonArray(jsonObject, fieldName);
+        MinecraftProfile.Cape[] capes = new MinecraftProfile.Cape[array.size()];
+
+        for (int index = 0; index < array.size(); index++) {
+            JsonObject capeObject = array.get(index).getAsJsonObject();
+            capes[index] = new MinecraftProfile.Cape(
+                    getString(capeObject, "id"),
+                    getString(capeObject, "state"),
+                    getString(capeObject, "url"),
+                    getString(capeObject, "alias")
+            );
+        }
+
+        return capes;
+    }
+
+    private JsonArray getJsonArray(JsonObject jsonObject, String fieldName) {
+        if (!jsonObject.has(fieldName) || !jsonObject.get(fieldName).isJsonArray())
+            return new JsonArray();
+
+        return jsonObject.getAsJsonArray(fieldName);
     }
 }

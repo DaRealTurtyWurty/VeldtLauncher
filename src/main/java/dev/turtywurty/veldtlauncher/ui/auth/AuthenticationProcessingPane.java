@@ -18,11 +18,15 @@ import dev.turtywurty.veldtlauncher.auth.event.WaitingForCallbackEvent;
 import dev.turtywurty.veldtlauncher.auth.event.XboxAuthStartedEvent;
 import dev.turtywurty.veldtlauncher.event.EventListener;
 import dev.turtywurty.veldtlauncher.event.EventStream;
+import dev.turtywurty.veldtlauncher.ui.Stylesheets;
+import dev.turtywurty.veldtlauncher.ui.WindowChrome;
+import dev.turtywurty.veldtlauncher.ui.dashboard.shell.DashboardShell;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
@@ -36,15 +40,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class AuthenticationProcessingPane extends AnchorPane {
     public AuthenticationProcessingPane(EventStream eventStream, Runnable onBack) {
-        getStylesheets().add(Objects.requireNonNull(
-                AuthenticationProcessingPane.class.getResource("/dev/turtywurty/veldtlauncher/ui/authenticate-processing-pane.css"),
-                "Missing stylesheet: authenticate-processing-pane.css"
-        ).toExternalForm());
+        Stylesheets.addAll(this, "authenticate-processing-pane.css", "shared-controls.css");
 
         getStyleClass().add("authentication-processing-pane");
 
@@ -129,10 +129,19 @@ public class AuthenticationProcessingPane extends AnchorPane {
         content.getChildren().add(card);
         getChildren().add(content);
 
+        var windowBar = new HBox(WindowChrome.createWindowControls(this));
+        windowBar.setAlignment(Pos.CENTER_RIGHT);
+        windowBar.setPadding(new Insets(12, 12, 0, 12));
+        WindowChrome.installDragSupport(windowBar);
+        AnchorPane.setTopAnchor(windowBar, 0.0);
+        AnchorPane.setLeftAnchor(windowBar, 0.0);
+        AnchorPane.setRightAnchor(windowBar, 0.0);
+        getChildren().add(windowBar);
+
         AtomicReference<EventListener<AuthEvent>> listenerRef = new AtomicReference<>();
         AtomicReference<Timeline> countdownRef = new AtomicReference<>();
         AtomicReference<DeviceCodeRequestedEvent> deviceCodeRef = new AtomicReference<>();
-        sceneProperty().addListener((_, oldScene, newScene) -> {
+        sceneProperty().addListener((_, _, newScene) -> {
             EventListener<AuthEvent> currentListener = listenerRef.getAndSet(null);
             if (currentListener != null) {
                 eventStream.unregisterListener(currentListener);
@@ -192,7 +201,7 @@ public class AuthenticationProcessingPane extends AnchorPane {
                 status.setText("Device code ready.");
                 details.setText(buildDeviceCodeMessage(deviceCodeEvent));
             }
-            case DeviceCodePollingStartedEvent deviceCodeEvent -> {
+            case DeviceCodePollingStartedEvent _ -> {
                 stopCountdown(countdownRef);
                 showCopyFields(deviceCodeRef.get(), deviceCodeRow, deviceCodeField, verificationUriRow, verificationUriField);
                 status.setText("Waiting for device-code approval...");
@@ -277,12 +286,17 @@ public class AuthenticationProcessingPane extends AnchorPane {
                 details.setText("Your Minecraft session is ready.");
                 backButton.setManaged(false);
                 backButton.setVisible(false);
+                Scene scene = getScene();
+                if (scene != null) {
+                    DashboardShell.show(scene);
+                }
             }
             case AuthenticationFailedEvent failedEvent -> {
                 stopCountdown(countdownRef);
                 if (deviceCodeRef.get() == null) {
                     hideCopyFields(deviceCodeRow, deviceCodeField, verificationUriRow, verificationUriField);
                 }
+
                 if (!indicator.getStyleClass().contains("authentication-progress-indicator-failed")) {
                     indicator.getStyleClass().add("authentication-progress-indicator-failed");
                 }

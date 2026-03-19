@@ -1,0 +1,69 @@
+.veldt-back-button {
+    -fx-background-color: rgba(24, 24, 24, 0.92);
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(255, 255, 255, 0.10);
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-graphic-text-gap: 10;
+    -fx-padding: 10 16 10 16;
+    -fx-text-fill: #ececec;
+}
+
+.veldt-back-button:hover {
+    -fx-background-color: rgba(36, 36, 36, 0.96);
+}
+
+.veldt-back-button:pressed {
+    -fx-background-color: rgba(18, 18, 18, 0.96);
+}
+
+.veldt-back-icon {
+    -fx-icon-color: #ececec;
+    -fx-icon-size: 14;
+}
+
+.window-controls {
+    -fx-alignment: center-right;
+}
+
+.window-control-button {
+    -fx-alignment: center;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent;
+    -fx-border-radius: 0;
+    -fx-border-width: 0;
+    -fx-cursor: hand;
+    -fx-min-height: 28;
+    -fx-min-width: 28;
+    -fx-pref-height: 28;
+    -fx-pref-width: 28;
+    -fx-max-height: 28;
+    -fx-max-width: 28;
+    -fx-padding: 0;
+}
+
+.window-control-button:hover {
+    -fx-background-color: transparent;
+}
+
+.window-control-button:pressed {
+    -fx-background-color: transparent;
+}
+
+.window-control-button:disabled {
+    -fx-opacity: 0.45;
+}
+
+.window-control-close-button:hover {
+    -fx-background-color: transparent;
+}
+
+.window-control-icon {
+    -fx-icon-color: #ececec;
+    -fx-icon-size: 11;
+}
