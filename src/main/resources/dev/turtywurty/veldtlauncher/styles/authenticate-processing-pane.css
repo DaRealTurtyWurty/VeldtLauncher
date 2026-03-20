@@ -49,7 +49,14 @@
     -fx-text-alignment: center;
 }
 
-.authentication-processing-copy-field {
+.authentication-processing-device-code-row {
+    -fx-alignment: center;
+    -fx-cursor: hand;
+    -fx-spacing: 8;
+}
+
+.authentication-processing-device-code-box {
+    -fx-alignment: center;
     -fx-background-color: rgba(16, 16, 16, 0.9);
     -fx-background-insets: 0;
     -fx-background-radius: 14;
@@ -57,37 +64,37 @@
     -fx-border-radius: 14;
     -fx-border-width: 1;
     -fx-font-family: "Consolas", "Cascadia Code", monospace;
-    -fx-font-size: 14px;
-    -fx-highlight-fill: rgba(120, 120, 120, 0.45);
-    -fx-highlight-text-fill: #f1f1f1;
-    -fx-padding: 8 12 8 12;
+    -fx-font-size: 22px;
+    -fx-font-weight: 700;
     -fx-text-fill: #f1f1f1;
 }
 
-.authentication-processing-copy-field .text {
-    -fx-text-alignment: center;
+.authentication-processing-device-code-row:hover .authentication-processing-device-code-box {
+    -fx-border-color: rgba(126, 180, 255, 0.34);
 }
 
-.authentication-processing-copy-row {
-    -fx-alignment: center-left;
+.authentication-processing-link-row {
+    -fx-alignment: center;
 }
 
-.authentication-processing-copy-button {
-    -fx-background-color: rgba(255, 255, 255, 0.06);
-    -fx-background-radius: 12;
-    -fx-border-color: rgba(255, 255, 255, 0.10);
-    -fx-border-radius: 12;
-    -fx-border-width: 1;
+.authentication-processing-link {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
     -fx-cursor: hand;
     -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
     -fx-font-size: 13px;
     -fx-font-weight: 700;
-    -fx-padding: 10 14 10 14;
-    -fx-text-fill: #e0e0e0;
+    -fx-padding: 0;
+    -fx-text-fill: #7eb4ff;
+    -fx-underline: true;
 }
 
-.authentication-processing-copy-button:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.10);
+.authentication-processing-link:hover {
+    -fx-text-fill: #a8ccff;
+}
+
+.authentication-processing-link:armed {
+    -fx-text-fill: #5f95db;
 }
 
 .authentication-processing-back-button {
@@ -106,4 +113,19 @@
 
 .authentication-processing-back-button:hover {
     -fx-background-color: rgba(255, 255, 255, 0.05);
+}
+
+.authentication-processing-toast {
+    -fx-alignment: center;
+    -fx-background-color: rgba(18, 18, 18, 0.96);
+    -fx-background-radius: 999;
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-radius: 999;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.28), 18, 0.18, 0, 6);
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-padding: 10 16 10 16;
+    -fx-text-fill: #f1f1f1;
 }

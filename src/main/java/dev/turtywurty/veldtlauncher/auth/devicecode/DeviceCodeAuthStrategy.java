@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class DeviceCodeAuthStrategy implements AuthStrategy {
@@ -115,13 +116,21 @@ public class DeviceCodeAuthStrategy implements AuthStrategy {
             emit(new MinecraftProfileFetchedEvent(profile.name(), profile.id()));
             emit(new AuthenticationSucceededEvent(profile.name(), profile.id()));
 
+            String skinUrl = Arrays.stream(profile.skins())
+                    .filter(Objects::nonNull)
+                    .map(MinecraftProfile.Skin::url)
+                    .filter(url -> url != null && !url.isBlank())
+                    .findFirst()
+                    .orElse(null);
+
             long now = System.currentTimeMillis();
             this.sessionStore.save(new StoredSessionMetadata(
                     profile.id(),
                     profile.name(),
                     now + (minecraftToken.expiresIn() * 1000L),
                     minecraftToken.username(),
-                    now
+                    now,
+                    skinUrl
             ));
             this.sessionStore.setLastSession(profile.id());
 

@@ -27,9 +27,13 @@ public interface SessionStore {
 
     Optional<StoredSessionMetadata> loadLastSession();
 
+    boolean hasLastSession();
+
     void save(StoredSessionMetadata session);
 
     void setLastSession(String userId);
+
+    void clearLastSession();
 
     void delete(String userId);
 

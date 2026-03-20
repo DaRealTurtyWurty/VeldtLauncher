@@ -37,7 +37,8 @@
     -fx-cursor: hand;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.38), 32, 0.18, 0, 14);
     -fx-padding: 24;
-    -fx-pref-height: 196;
+    -fx-min-height: 224;
+    -fx-pref-height: 224;
     -fx-pref-width: 196;
 }
 
@@ -54,14 +55,19 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.28), 30, 0.16, 0, 12);
 }
 
-.account-card-avatar {
+.account-card-avatar,
+.account-card-skin-avatar {
     -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.34), 18, 0.2, 0, 6);
+    -fx-min-height: 96;
+    -fx-min-width: 96;
+    -fx-pref-height: 96;
+    -fx-pref-width: 96;
+}
+
+.account-card-avatar {
     -fx-background-color: linear-gradient(to bottom right, #1a73d9, #2fa0ff);
     -fx-background-radius: 999;
-    -fx-min-height: 92;
-    -fx-min-width: 92;
-    -fx-pref-height: 92;
-    -fx-pref-width: 92;
 }
 
 .account-card-avatar-text {
@@ -85,6 +91,7 @@
     -fx-font-weight: 600;
     -fx-text-alignment: center;
     -fx-text-fill: rgba(210, 210, 210, 0.72);
+    -fx-fill: rgba(210, 210, 210, 0.72);
 }
 
 .add-account-card {

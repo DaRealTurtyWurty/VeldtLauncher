@@ -1,13 +1,21 @@
 package dev.turtywurty.veldtlauncher.ui.auth;
 
 import dev.turtywurty.veldtlauncher.auth.session.StoredSessionMetadata;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
+import javafx.util.Duration;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -17,38 +25,64 @@ import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 public class AccountCard extends VBox {
+    private static final int AVATAR_SIZE = 96;
+    private static final double CARD_TEXT_WIDTH = 148;
+    private static final Duration LAST_ACCESSED_REFRESH_INTERVAL = Duration.seconds(1);
     private static final DateTimeFormatter LAST_ACCESSED_TOOLTIP_FORMATTER =
             DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm").withZone(ZoneId.systemDefault());
 
+    private final long lastAccessedAt;
+    private final Text lastAccessedText = new Text();
+    private final Tooltip lastAccessedTooltip = new Tooltip();
+    private final Timeline lastAccessedRefreshTimeline = new Timeline(
+            new KeyFrame(LAST_ACCESSED_REFRESH_INTERVAL, _ -> refreshLastAccessedText())
+    );
+
     public AccountCard(StoredSessionMetadata session) {
+        this.lastAccessedAt = session.lastAccessedAt();
         setSpacing(8);
         setAlignment(Pos.CENTER);
         setFocusTraversable(true);
         getStyleClass().add("account-card");
+        this.lastAccessedRefreshTimeline.setCycleCount(Animation.INDEFINITE);
 
         var avatarText = new Label(extractInitial(session.username()));
         avatarText.getStyleClass().add("account-card-avatar-text");
 
-        var avatar = new StackPane(avatarText);
-        avatar.getStyleClass().add("account-card-avatar");
-        avatar.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        avatar.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        avatar.setStyle(buildAvatarStyle(session.userId(), session.username()));
+        StackPane avatar = createFallbackAvatar(avatarText, session.userId(), session.username());
+        if (session.skinUrl() != null) {
+            var skinAvatar = SkinAvatarView.create(session.skinUrl(), AVATAR_SIZE);
+            if (skinAvatar != null)
+                avatar = createSkinAvatar(skinAvatar);
+        }
 
         var username = new Label(defaultText(session.username(), "Unknown player"));
         username.getStyleClass().add("account-card-title");
         username.setWrapText(true);
-        username.setMaxWidth(Double.MAX_VALUE);
+        username.setMinWidth(0);
+        username.setPrefWidth(CARD_TEXT_WIDTH);
+        username.setMaxWidth(CARD_TEXT_WIDTH);
         username.setAlignment(Pos.CENTER);
 
-        var lastAccessed = new Label(formatLastAccessed(session.lastAccessedAt()));
-        lastAccessed.getStyleClass().add("account-card-last-accessed");
-        lastAccessed.setWrapText(true);
-        lastAccessed.setMaxWidth(Double.MAX_VALUE);
-        lastAccessed.setAlignment(Pos.CENTER);
-        Tooltip.install(lastAccessed, new Tooltip(formatLastAccessedTooltip(session.lastAccessedAt())));
+        this.lastAccessedText.getStyleClass().add("account-card-last-accessed");
+        var lastAccessedFlow = new TextFlow(this.lastAccessedText);
+        lastAccessedFlow.setTextAlignment(TextAlignment.CENTER);
+        lastAccessedFlow.setPrefWidth(CARD_TEXT_WIDTH);
+        lastAccessedFlow.setMaxWidth(CARD_TEXT_WIDTH);
+        Tooltip.install(lastAccessedFlow, this.lastAccessedTooltip);
+        refreshLastAccessedText();
 
-        getChildren().addAll(avatar, username, lastAccessed);
+        sceneProperty().addListener((_, _, newScene) -> {
+            if (newScene == null) {
+                this.lastAccessedRefreshTimeline.stop();
+                return;
+            }
+
+            refreshLastAccessedText();
+            this.lastAccessedRefreshTimeline.play();
+        });
+
+        getChildren().addAll(avatar, username, lastAccessedFlow);
     }
 
     public void setSelected(boolean selected) {
@@ -83,9 +117,13 @@ public class AccountCard extends VBox {
         if (instant.isAfter(now))
             return "Last accessed just now";
 
-        long minutes = ChronoUnit.MINUTES.between(instant, now);
-        if (minutes <= 0L)
+        long seconds = ChronoUnit.SECONDS.between(instant, now);
+        if (seconds < 10L)
             return "Last accessed just now";
+        if (seconds < 60L)
+            return "Last accessed " + seconds + " seconds ago";
+
+        long minutes = ChronoUnit.MINUTES.between(instant, now);
         if (minutes == 1L)
             return "Last accessed 1 minute ago";
         if (minutes < 60L)
@@ -154,8 +192,8 @@ public class AccountCard extends VBox {
         );
 
         return "-fx-background-color: linear-gradient(to bottom right, "
-               + toHex(start) + ", "
-               + toHex(end) + ");";
+                + toHex(start) + ", "
+                + toHex(end) + ");";
     }
 
     private static String toHex(Color color) {
@@ -163,5 +201,35 @@ public class AccountCard extends VBox {
         int green = (int) Math.round(color.getGreen() * 255);
         int blue = (int) Math.round(color.getBlue() * 255);
         return String.format("#%02x%02x%02x", red, green, blue);
+    }
+
+    private static StackPane createFallbackAvatar(Label avatarText, String userId, String username) {
+        StackPane avatar = createAvatarContainer(avatarText, "account-card-avatar");
+        configureAvatarContainer(avatar);
+        avatar.setStyle(buildAvatarStyle(userId, username));
+        return avatar;
+    }
+
+    private static StackPane createSkinAvatar(SkinAvatarView skinAvatar) {
+        StackPane avatar = createAvatarContainer(skinAvatar, "account-card-skin-avatar");
+        configureAvatarContainer(avatar);
+        avatar.setSnapToPixel(true);
+        return avatar;
+    }
+
+    private static StackPane createAvatarContainer(Node content, String styleClass) {
+        var avatar = new StackPane(content);
+        avatar.getStyleClass().add(styleClass);
+        return avatar;
+    }
+
+    private static void configureAvatarContainer(StackPane avatar) {
+        avatar.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        avatar.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+    }
+
+    private void refreshLastAccessedText() {
+        this.lastAccessedText.setText(formatLastAccessed(this.lastAccessedAt));
+        this.lastAccessedTooltip.setText(formatLastAccessedTooltip(this.lastAccessedAt));
     }
 }

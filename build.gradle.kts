@@ -31,7 +31,7 @@ application {
 
 javafx {
     version = "25.0.2"
-    modules = listOf("javafx.controls")
+    modules = listOf("javafx.controls", "javafx.swing", "javafx.graphics")
 }
 
 dependencies {
@@ -42,6 +42,8 @@ dependencies {
     implementation("org.slf4j:slf4j-api:2.0.17")
     implementation("ch.qos.logback:logback-classic:1.5.32")
     implementation("com.github.javakeyring:java-keyring:1.0.4")
+    implementation("io.nayuki:qrcodegen:1.8.0")
+
     compileOnly("org.jetbrains:annotations:26.0.2")
 }
 

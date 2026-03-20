@@ -10,11 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Optional;
 
 public class JsonSessionStore implements SessionStore {
@@ -23,7 +23,8 @@ public class JsonSessionStore implements SessionStore {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonSessionStore.class);
-    private static final Type SESSION_LIST_TYPE = new TypeToken<List<StoredSessionMetadata>>() { }.getType();
+    private static final Type SESSION_LIST_TYPE = new TypeToken<List<StoredSessionMetadata>>() {
+    }.getType();
 
     private final Path path;
 
@@ -46,10 +47,15 @@ public class JsonSessionStore implements SessionStore {
             }
         }
 
-        if (state.sessions().isEmpty())
-            return Optional.empty();
+        return Optional.empty();
+    }
 
-        return Optional.of(state.sessions().getLast());
+    @Override
+    public boolean hasLastSession() {
+        SessionStoreState state = loadState();
+        return state.lastSessionUserId() != null
+                && !state.lastSessionUserId().isBlank()
+                && state.sessions().stream().anyMatch(session -> state.lastSessionUserId().equals(session.userId()));
     }
 
     @Override
@@ -87,6 +93,16 @@ public class JsonSessionStore implements SessionStore {
             writeState(new SessionStoreState(updatedSessions, userId));
         } catch (Exception exception) {
             LOGGER.error("Failed to update last StoredSessionMetadata entry in file: {}", this.path, exception);
+        }
+    }
+
+    @Override
+    public synchronized void clearLastSession() {
+        try {
+            SessionStoreState state = loadState();
+            writeState(new SessionStoreState(state.sessions(), null));
+        } catch (Exception exception) {
+            LOGGER.error("Failed to clear last StoredSessionMetadata entry in file: {}", this.path, exception);
         }
     }
 
@@ -201,7 +217,8 @@ public class JsonSessionStore implements SessionStore {
                 session.username(),
                 session.expiresAt(),
                 session.accountId(),
-                timestamp
+                timestamp,
+                session.skinUrl()
         );
     }
 
@@ -213,10 +230,13 @@ public class JsonSessionStore implements SessionStore {
     }
 
     private String normalizeLastSessionUserId(List<StoredSessionMetadata> sessions, String userId) {
+        if (userId == null || userId.isBlank())
+            return null;
+
         if (containsUser(sessions, userId))
             return userId;
 
-        return sessions == null || sessions.isEmpty() ? null : sessions.getLast().userId();
+        return null;
     }
 
     private record SessionStoreState(List<StoredSessionMetadata> sessions, String lastSessionUserId) {

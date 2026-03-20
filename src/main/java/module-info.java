@@ -9,6 +9,8 @@ module dev.turtywurty.veldtlauncher {
     requires static org.jetbrains.annotations;
     requires com.google.gson;
     requires java.keyring;
+    requires io.nayuki.qrcodegen;
+    requires javafx.swing;
 
     exports dev.turtywurty.veldtlauncher;
     opens dev.turtywurty.veldtlauncher.auth.session to com.google.gson;

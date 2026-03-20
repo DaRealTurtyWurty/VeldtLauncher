@@ -1,5 +1,6 @@
 package dev.turtywurty.veldtlauncher.ui.dashboard.shell;
 
+import dev.turtywurty.veldtlauncher.auth.session.JsonSessionStore;
 import dev.turtywurty.veldtlauncher.ui.Stylesheets;
 import dev.turtywurty.veldtlauncher.ui.WindowChrome;
 import dev.turtywurty.veldtlauncher.ui.auth.PickAccountPane;
@@ -304,6 +305,8 @@ public class DashboardShell extends BorderPane {
     }
 
     private void signOut() {
+        JsonSessionStore.INSTANCE.clearLastSession();
+
         Scene scene = getScene();
         if (scene != null) {
             scene.setRoot(new PickAccountPane());

@@ -15,11 +15,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import org.kordamp.ikonli.fontawesome6.FontAwesomeBrands;
 import org.kordamp.ikonli.fontawesome6.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 public class AuthenticatePane extends AnchorPane {
     public AuthenticatePane() {
@@ -43,15 +46,15 @@ public class AuthenticatePane extends AnchorPane {
         var card = new VBox(16);
         card.setAlignment(Pos.CENTER);
         card.setFillWidth(true);
-        card.setMaxWidth(420);
+        card.setMaxWidth(456);
         card.getStyleClass().add("authenticate-card");
 
         var title = new Text("Authenticate");
         title.getStyleClass().add("authenticate-title");
 
-        var description = new Text("Please sign in to your Minecraft account to continue.");
+        var description = new Text("Sign in with Microsoft to access your Minecraft profile.");
         description.getStyleClass().add("authenticate-description");
-        description.wrappingWidthProperty().bind(card.maxWidthProperty().subtract(56));
+        description.wrappingWidthProperty().bind(card.maxWidthProperty().subtract(40));
 
         var microsoftIcon = new FontIcon(FontAwesomeBrands.MICROSOFT);
         microsoftIcon.getStyleClass().add("authenticate-microsoft-icon");
@@ -60,11 +63,30 @@ public class AuthenticatePane extends AnchorPane {
         button.getStyleClass().add("authenticate-button");
         button.setOnAction(_ -> startAuthentication(new PkceAuthStrategy(new SimpleEventStream())));
 
+        var secureIcon = new FontIcon(FontAwesomeSolid.LOCK);
+        secureIcon.getStyleClass().add("authenticate-security-icon");
+        var secureTitle = new Text("Browser-based sign-in");
+        secureTitle.getStyleClass().add("authenticate-security-title");
+        var secureDescription = new Text("The launcher opens Microsoft's sign-in page in your browser. Your password is never handled here.");
+        secureDescription.getStyleClass().add("authenticate-security-description");
+        var secureCopy = new VBox(4, secureTitle, secureDescription);
+        secureCopy.setFillWidth(true);
+        HBox.setHgrow(secureCopy, Priority.ALWAYS);
+        var secureNote = new HBox(12, secureIcon, secureCopy);
+        secureNote.setAlignment(Pos.TOP_LEFT);
+        secureNote.getStyleClass().add("authenticate-security-note");
+
         var havingTroubleSigningIn = new Hyperlink("Having trouble signing in?");
         havingTroubleSigningIn.getStyleClass().add("authenticate-having-trouble");
         havingTroubleSigningIn.setOnAction(_ -> startAuthentication(new DeviceCodeAuthStrategy(new SimpleEventStream())));
 
-        card.getChildren().addAll(title, description, button, havingTroubleSigningIn);
+        card.getChildren().addAll(
+                title,
+                description,
+                button,
+                secureNote,
+                havingTroubleSigningIn
+        );
         content.getChildren().add(card);
 
         var backIcon = new FontIcon(FontAwesomeSolid.ARROW_LEFT);
@@ -101,7 +123,13 @@ public class AuthenticatePane extends AnchorPane {
     private void startAuthentication(AuthStrategy authStrategy) {
         EventStream eventStream = authStrategy.eventStream();
         Scene scene = getScene();
+        AtomicReference<Thread> authThreadRef = new AtomicReference<>();
         var processingPane = new AuthenticationProcessingPane(eventStream, () -> {
+            Thread authThread = authThreadRef.getAndSet(null);
+            if (authThread != null) {
+                authThread.interrupt();
+            }
+
             if (scene != null) {
                 scene.setRoot(new AuthenticatePane());
             }
@@ -111,7 +139,7 @@ public class AuthenticatePane extends AnchorPane {
             scene.setRoot(processingPane);
         }
 
-        Thread.startVirtualThread(() -> {
+        Thread authThread = Thread.startVirtualThread(() -> {
             try {
                 authStrategy.authenticate();
             } catch (Exception ignored) {
@@ -123,5 +151,6 @@ public class AuthenticatePane extends AnchorPane {
                 });
             }
         });
+        authThreadRef.set(authThread);
     }
 }

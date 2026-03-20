@@ -5,6 +5,7 @@ public record StoredSessionMetadata(
         String username,
         long expiresAt,
         String accountId,
-        long lastAccessedAt
+        long lastAccessedAt,
+        String skinUrl
 ) {
 }

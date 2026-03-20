@@ -30,7 +30,8 @@ public class PickAccountPane extends AnchorPane {
             "Turtywurty",
             System.currentTimeMillis() + 86_400_000L * 14,
             "sample.account.preview@veldtlauncher.dev",
-            System.currentTimeMillis() - ThreadLocalRandom.current().nextLong(86_400_000L)
+            System.currentTimeMillis() - ThreadLocalRandom.current().nextLong(86_400_000L),
+            null
     );
 
     private final ObservableList<StoredSessionMetadata> sessions = FXCollections.observableArrayList();
