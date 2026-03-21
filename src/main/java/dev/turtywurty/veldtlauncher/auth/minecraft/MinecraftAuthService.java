@@ -1,11 +1,11 @@
 package dev.turtywurty.veldtlauncher.auth.minecraft;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import dev.turtywurty.veldtlauncher.auth.AuthException;
 import dev.turtywurty.veldtlauncher.auth.xbox.xsts.XstsToken;
+import dev.turtywurty.veldtlauncher.util.JsonUtil;
 
 import java.io.IOException;
 import java.net.URI;
@@ -57,7 +57,7 @@ public final class MinecraftAuthService implements MinecraftAuthenticationServic
                 "Minecraft login_with_xbox endpoint"
         );
 
-        if (!jsonObject.has("access_token"))
+        if (!JsonUtil.contains(jsonObject, "access_token"))
             throw new AuthException(buildMinecraftServicesErrorMessage(
                     "Minecraft login_with_xbox endpoint",
                     response.statusCode(),
@@ -72,11 +72,11 @@ public final class MinecraftAuthService implements MinecraftAuthenticationServic
         final MinecraftAccessToken accessToken;
         try {
             accessToken = new MinecraftAccessToken(
-                    getString(jsonObject, "username"),
-                    getStringArray(jsonObject, "roles"),
-                    getString(jsonObject, "access_token"),
-                    getString(jsonObject, "token_type"),
-                    getLong(jsonObject, "expires_in")
+                    JsonUtil.getString(jsonObject, "username"),
+                    JsonUtil.getStringArray(jsonObject, "roles"),
+                    JsonUtil.getString(jsonObject, "access_token"),
+                    JsonUtil.getString(jsonObject, "token_type"),
+                    JsonUtil.getLong(jsonObject, "expires_in")
             );
         } catch (RuntimeException exception) {
             throw new AuthException("Failed to parse Minecraft access token response.", exception);
@@ -143,7 +143,7 @@ public final class MinecraftAuthService implements MinecraftAuthenticationServic
             int statusCode,
             JsonObject jsonObject
     ) {
-        String errorMessage = getString(jsonObject, "errorMessage");
+        String errorMessage = JsonUtil.getString(jsonObject, "errorMessage");
         if ("Minecraft login_with_xbox endpoint".equals(endpointName)
                 && errorMessage != null
                 && errorMessage.contains("Invalid app registration")) {
@@ -166,44 +166,12 @@ public final class MinecraftAuthService implements MinecraftAuthenticationServic
     }
 
     private void appendField(StringBuilder builder, JsonObject jsonObject, String fieldName) {
-        if (jsonObject == null || !jsonObject.has(fieldName) || jsonObject.get(fieldName).isJsonNull())
-            return;
-
-        String value = jsonObject.get(fieldName).getAsString();
+        String value = JsonUtil.getString(jsonObject, fieldName);
         if (!isBlank(value))
             builder.append(": ").append(fieldName).append('=').append(value);
     }
 
     private boolean isBlank(String value) {
         return value == null || value.isBlank();
-    }
-
-    private String getString(JsonObject jsonObject, String fieldName) {
-        if (!jsonObject.has(fieldName))
-            return null;
-
-        JsonElement element = jsonObject.get(fieldName);
-        if (element == null || element.isJsonNull())
-            return null;
-
-        return element.getAsString();
-    }
-
-    private long getLong(JsonObject jsonObject, String fieldName) {
-        if (!jsonObject.has(fieldName))
-            return 0;
-
-        JsonElement element = jsonObject.get(fieldName);
-        if (element == null || element.isJsonNull())
-            return 0;
-
-        return element.getAsLong();
-    }
-
-    private String[] getStringArray(JsonObject jsonObject, String fieldName) {
-        if (!jsonObject.has(fieldName) || !jsonObject.get(fieldName).isJsonArray())
-            return new String[0];
-
-        return GSON.fromJson(jsonObject.get(fieldName), String[].class);
     }
 }

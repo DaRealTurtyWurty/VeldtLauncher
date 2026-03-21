@@ -2,10 +2,10 @@ package dev.turtywurty.veldtlauncher.auth.minecraft;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import dev.turtywurty.veldtlauncher.auth.AuthException;
+import dev.turtywurty.veldtlauncher.util.JsonUtil;
 
 import java.io.IOException;
 import java.net.URI;
@@ -54,7 +54,7 @@ public final class MinecraftProfileService implements MinecraftProfileLookupServ
     private MinecraftProfile handleProfileResponse(HttpResponse<String> response) {
         JsonObject jsonObject = parseJson(response.body(), "Minecraft profile endpoint");
 
-        if (!jsonObject.has("id") || !jsonObject.has("name"))
+        if (!JsonUtil.contains(jsonObject, "id") || !JsonUtil.contains(jsonObject, "name"))
             throw new AuthException(buildMinecraftServicesErrorMessage(
                     "Minecraft profile endpoint",
                     response.statusCode(),
@@ -69,8 +69,8 @@ public final class MinecraftProfileService implements MinecraftProfileLookupServ
         final MinecraftProfile profile;
         try {
             profile = new MinecraftProfile(
-                    getString(jsonObject, "id"),
-                    getString(jsonObject, "name"),
+                    JsonUtil.getString(jsonObject, "id"),
+                    JsonUtil.getString(jsonObject, "name"),
                     getSkins(jsonObject, "skins"),
                     getCapes(jsonObject, "capes")
             );
@@ -138,10 +138,7 @@ public final class MinecraftProfileService implements MinecraftProfileLookupServ
     }
 
     private void appendField(StringBuilder builder, JsonObject jsonObject, String fieldName) {
-        if (jsonObject == null || !jsonObject.has(fieldName) || jsonObject.get(fieldName).isJsonNull())
-            return;
-
-        String value = jsonObject.get(fieldName).getAsString();
+        String value = JsonUtil.getString(jsonObject, fieldName);
         if (!isBlank(value))
             builder.append(": ").append(fieldName).append('=').append(value);
     }
@@ -150,29 +147,18 @@ public final class MinecraftProfileService implements MinecraftProfileLookupServ
         return value == null || value.isBlank();
     }
 
-    private String getString(JsonObject jsonObject, String fieldName) {
-        if (!jsonObject.has(fieldName))
-            return null;
-
-        JsonElement element = jsonObject.get(fieldName);
-        if (element == null || element.isJsonNull())
-            return null;
-
-        return element.getAsString();
-    }
-
     private MinecraftProfile.Skin[] getSkins(JsonObject jsonObject, String fieldName) {
-        JsonArray array = getJsonArray(jsonObject, fieldName);
+        JsonArray array = JsonUtil.getArray(jsonObject, fieldName);
         MinecraftProfile.Skin[] skins = new MinecraftProfile.Skin[array.size()];
 
         for (int index = 0; index < array.size(); index++) {
-            JsonObject skinObject = array.get(index).getAsJsonObject();
+            JsonObject skinObject = JsonUtil.getObject(array, index, new JsonObject());
             skins[index] = new MinecraftProfile.Skin(
-                    getString(skinObject, "id"),
-                    getString(skinObject, "state"),
-                    getString(skinObject, "url"),
-                    getString(skinObject, "variant"),
-                    getString(skinObject, "alias")
+                    JsonUtil.getString(skinObject, "id"),
+                    JsonUtil.getString(skinObject, "state"),
+                    JsonUtil.getString(skinObject, "url"),
+                    JsonUtil.getString(skinObject, "variant"),
+                    JsonUtil.getString(skinObject, "alias")
             );
         }
 
@@ -180,26 +166,19 @@ public final class MinecraftProfileService implements MinecraftProfileLookupServ
     }
 
     private MinecraftProfile.Cape[] getCapes(JsonObject jsonObject, String fieldName) {
-        JsonArray array = getJsonArray(jsonObject, fieldName);
+        JsonArray array = JsonUtil.getArray(jsonObject, fieldName);
         MinecraftProfile.Cape[] capes = new MinecraftProfile.Cape[array.size()];
 
         for (int index = 0; index < array.size(); index++) {
-            JsonObject capeObject = array.get(index).getAsJsonObject();
+            JsonObject capeObject = JsonUtil.getObject(array, index, new JsonObject());
             capes[index] = new MinecraftProfile.Cape(
-                    getString(capeObject, "id"),
-                    getString(capeObject, "state"),
-                    getString(capeObject, "url"),
-                    getString(capeObject, "alias")
+                    JsonUtil.getString(capeObject, "id"),
+                    JsonUtil.getString(capeObject, "state"),
+                    JsonUtil.getString(capeObject, "url"),
+                    JsonUtil.getString(capeObject, "alias")
             );
         }
 
         return capes;
-    }
-
-    private JsonArray getJsonArray(JsonObject jsonObject, String fieldName) {
-        if (!jsonObject.has(fieldName) || !jsonObject.get(fieldName).isJsonArray())
-            return new JsonArray();
-
-        return jsonObject.getAsJsonArray(fieldName);
     }
 }

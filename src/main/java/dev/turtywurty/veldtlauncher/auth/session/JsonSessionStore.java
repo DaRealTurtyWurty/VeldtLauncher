@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import dev.turtywurty.veldtlauncher.config.FileConfig;
+import dev.turtywurty.veldtlauncher.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -153,7 +154,8 @@ public class JsonSessionStore implements SessionStore {
             }
 
             if (jsonElement.isJsonObject()) {
-                if (jsonElement.getAsJsonObject().has("sessions") || jsonElement.getAsJsonObject().has("lastSessionUserId")) {
+                var jsonObject = jsonElement.getAsJsonObject();
+                if (JsonUtil.contains(jsonObject, "sessions") || JsonUtil.contains(jsonObject, "lastSessionUserId")) {
                     SessionStoreState state = GSON.fromJson(jsonElement, SessionStoreState.class);
                     if (state == null)
                         return SessionStoreState.empty();

@@ -1,10 +1,11 @@
 package dev.turtywurty.veldtlauncher.auth.xbox.xsts;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import dev.turtywurty.veldtlauncher.auth.AuthException;
+import dev.turtywurty.veldtlauncher.util.JsonUtil;
 
 public final class XstsAuthorizeResponseParser {
     private static final Gson GSON = new Gson();
@@ -26,12 +27,12 @@ public final class XstsAuthorizeResponseParser {
         if (jsonObject == null)
             throw new AuthException("XSTS authorize response JSON was null.");
 
-        if (jsonObject.has("Token")) {
+        if (JsonUtil.contains(jsonObject, "Token")) {
             try {
                 XstsToken token = new XstsToken(
-                        getString(jsonObject, "IssueInstant"),
-                        getString(jsonObject, "NotAfter"),
-                        getString(jsonObject, "Token"),
+                        JsonUtil.getString(jsonObject, "IssueInstant"),
+                        JsonUtil.getString(jsonObject, "NotAfter"),
+                        JsonUtil.getString(jsonObject, "Token"),
                         extractUhs(jsonObject)
                 );
                 return XstsAuthorizeResponse.success(token);
@@ -40,13 +41,13 @@ public final class XstsAuthorizeResponseParser {
             }
         }
 
-        if (jsonObject.has("XErr") || jsonObject.has("Message")) {
+        if (JsonUtil.contains(jsonObject, "XErr") || JsonUtil.contains(jsonObject, "Message")) {
             try {
                 XstsError error = new XstsError(
-                        getString(jsonObject, "Identity"),
-                        getLongObject(jsonObject, "XErr"),
-                        getString(jsonObject, "Message"),
-                        getString(jsonObject, "Redirect")
+                        JsonUtil.getString(jsonObject, "Identity"),
+                        JsonUtil.getLongObject(jsonObject, "XErr"),
+                        JsonUtil.getString(jsonObject, "Message"),
+                        JsonUtil.getString(jsonObject, "Redirect")
                 );
                 return XstsAuthorizeResponse.error(error);
             } catch (RuntimeException exception) {
@@ -58,46 +59,9 @@ public final class XstsAuthorizeResponseParser {
     }
 
     private static String extractUhs(JsonObject jsonObject) {
-        if (jsonObject == null || !jsonObject.has("DisplayClaims"))
-            return null;
-
-        JsonObject displayClaims = getObject(jsonObject, "DisplayClaims");
-        if (displayClaims == null || !displayClaims.has("xui") || !displayClaims.get("xui").isJsonArray())
-            return null;
-
-        var xuiArray = displayClaims.getAsJsonArray("xui");
-        if (xuiArray.isEmpty() || !xuiArray.get(0).isJsonObject())
-            return null;
-
-        return getString(xuiArray.get(0).getAsJsonObject(), "uhs");
-    }
-
-    private static JsonObject getObject(JsonObject jsonObject, String fieldName) {
-        if (!jsonObject.has(fieldName) || !jsonObject.get(fieldName).isJsonObject())
-            return null;
-
-        return jsonObject.getAsJsonObject(fieldName);
-    }
-
-    private static String getString(JsonObject jsonObject, String fieldName) {
-        if (!jsonObject.has(fieldName))
-            return null;
-
-        JsonElement element = jsonObject.get(fieldName);
-        if (element == null || element.isJsonNull())
-            return null;
-
-        return element.getAsString();
-    }
-
-    private static Long getLongObject(JsonObject jsonObject, String fieldName) {
-        if (!jsonObject.has(fieldName))
-            return null;
-
-        JsonElement element = jsonObject.get(fieldName);
-        if (element == null || element.isJsonNull())
-            return null;
-
-        return element.getAsLong();
+        JsonObject displayClaims = JsonUtil.getObject(jsonObject, "DisplayClaims");
+        JsonArray xuiArray = JsonUtil.getArray(displayClaims, "xui", null);
+        JsonObject xuiObject = JsonUtil.getObject(xuiArray, 0);
+        return JsonUtil.getString(xuiObject, "uhs");
     }
 }

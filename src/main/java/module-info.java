@@ -11,6 +11,7 @@ module dev.turtywurty.veldtlauncher {
     requires java.keyring;
     requires io.nayuki.qrcodegen;
     requires javafx.swing;
+    requires com.sun.jna;
 
     exports dev.turtywurty.veldtlauncher;
     opens dev.turtywurty.veldtlauncher.auth.session to com.google.gson;
