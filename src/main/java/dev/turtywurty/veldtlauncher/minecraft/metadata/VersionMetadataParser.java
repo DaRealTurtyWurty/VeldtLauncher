@@ -128,7 +128,8 @@ public final class VersionMetadataParser {
 
             rules.add(new ArgumentRule(
                     JsonUtil.getString(ruleObject, "action"),
-                    parseFeatures(JsonUtil.getObject(ruleObject, "features"))
+                    parseFeatures(JsonUtil.getObject(ruleObject, "features")),
+                    parseOs(JsonUtil.getObject(ruleObject, "os"))
             ));
         }
 
