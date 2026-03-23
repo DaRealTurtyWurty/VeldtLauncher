@@ -16,30 +16,38 @@ public record InstallResult(
 ) {
     public boolean isPartiallyInstalled() {
         return !newlyInstalled && (
-                Files.notExists(versionJson) ||
-                        Files.notExists(clientJar) ||
-                        Files.notExists(librariesDirectory) ||
-                        Files.notExists(assetsDirectory) ||
-                        Files.notExists(nativesDirectory)
+                isMissing(versionDirectory) ||
+                        isMissing(versionJson) ||
+                        isMissing(clientJar) ||
+                        isMissing(librariesDirectory) ||
+                        isMissing(assetsDirectory) ||
+                        isMissing(nativesDirectory)
         );
     }
 
     public String getPartiallyInstalledReason() {
-        if (Files.notExists(versionJson))
+        if (isMissing(versionDirectory))
+            return "Version directory is missing.";
+
+        if (isMissing(versionJson))
             return "Version JSON is missing.";
 
-        if (Files.notExists(clientJar))
+        if (isMissing(clientJar))
             return "Client JAR is missing.";
 
-        if (Files.notExists(librariesDirectory))
+        if (isMissing(librariesDirectory))
             return "Libraries directory is missing.";
 
-        if (Files.notExists(assetsDirectory))
+        if (isMissing(assetsDirectory))
             return "Assets directory is missing.";
 
-        if (Files.notExists(nativesDirectory))
+        if (isMissing(nativesDirectory))
             return "Natives directory is missing.";
 
         return "Unknown reason.";
+    }
+
+    private boolean isMissing(Path path) {
+        return path == null || Files.notExists(path);
     }
 }

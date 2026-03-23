@@ -4,11 +4,16 @@ import dev.turtywurty.veldtlauncher.auth.session.JsonSessionStore;
 import dev.turtywurty.veldtlauncher.ui.Stylesheets;
 import dev.turtywurty.veldtlauncher.ui.WindowChrome;
 import dev.turtywurty.veldtlauncher.ui.auth.PickAccountPane;
+import dev.turtywurty.veldtlauncher.ui.dashboard.dialog.AddInstanceOverlay;
+import dev.turtywurty.veldtlauncher.ui.dashboard.dialog.InstancePlayOverlay;
 import dev.turtywurty.veldtlauncher.ui.dashboard.navigation.DefaultNavigator;
 import dev.turtywurty.veldtlauncher.ui.dashboard.navigation.Navigator;
 import dev.turtywurty.veldtlauncher.ui.dashboard.page.VeldtPage;
+import dev.turtywurty.veldtlauncher.ui.dashboard.page.library.LibraryPage;
 import dev.turtywurty.veldtlauncher.ui.dashboard.route.RouteId;
 import dev.turtywurty.veldtlauncher.ui.dashboard.route.RouteRegistry;
+import dev.turtywurty.veldtlauncher.instance.StoredInstanceMetadata;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -39,7 +44,11 @@ public class DashboardShell extends BorderPane {
     private final Label titleLabel = new Label();
     private final Map<SidebarItem, Button> sidebarButtons = new EnumMap<>(SidebarItem.class);
     private final Map<Button, Popup> buttonTooltips = new HashMap<>();
+    private final StackPane centerContainer = new StackPane();
     private RouteId currentRouteId;
+    private VeldtPage currentPage;
+    private AddInstanceOverlay addInstanceOverlay;
+    private InstancePlayOverlay instancePlayOverlay;
 
     public DashboardShell() {
         this(new DefaultNavigator(RouteId.LIBRARY_ALL));
@@ -49,6 +58,8 @@ public class DashboardShell extends BorderPane {
         this.navigator = Objects.requireNonNull(navigator, "navigator");
         Stylesheets.addAll(this, "shared-controls.css", "dashboard-shell.css");
         getStyleClass().add("dashboard-shell");
+        this.centerContainer.setPadding(new Insets(16));
+        setCenter(this.centerContainer);
         configureSidebar();
         configureTopBar();
         setCurrentPage(this.navigator.getCurrentPage());
@@ -57,6 +68,10 @@ public class DashboardShell extends BorderPane {
             setCurrentPage(newRouteId);
             updateNavigationButtons();
         });
+    }
+
+    public Navigator getNavigator() {
+        return navigator;
     }
 
     public static void show(Scene scene) {
@@ -115,7 +130,7 @@ public class DashboardShell extends BorderPane {
                 createRouteButton("Library", SidebarItem.LIBRARY, RouteId.LIBRARY_ALL, FontAwesomeSolid.BOOK),
                 createRouteButton("Discover", SidebarItem.DISCOVER, RouteId.DISCOVER_MODPACKS, FontAwesomeSolid.COMPASS),
                 createSidebarSeparator(),
-                createPrimaryRouteButton("Add Instance", SidebarItem.ADD_INSTANCE, RouteId.ADD_INSTANCE, FontAwesomeSolid.PLUS)
+                createPrimaryActionButton("Add Instance", FontAwesomeSolid.PLUS, this::showAddInstanceOverlay)
         );
         primaryNav.getStyleClass().add("dashboard-sidebar-group");
 
@@ -147,6 +162,13 @@ public class DashboardShell extends BorderPane {
 
     private Button createPrimaryRouteButton(String text, SidebarItem sidebarItem, RouteId routeId, FontAwesomeSolid icon) {
         return createRouteButton(text, sidebarItem, routeId, icon, true);
+    }
+
+    private Button createPrimaryActionButton(String text, FontAwesomeSolid icon, Runnable action) {
+        var button = createIconButton(text, icon, null);
+        button.getStyleClass().addAll("dashboard-nav-button", "dashboard-nav-button-primary");
+        button.setOnAction(_ -> action.run());
+        return button;
     }
 
     private Button createRouteButton(
@@ -209,11 +231,11 @@ public class DashboardShell extends BorderPane {
         RouteId currentRouteId = Objects.requireNonNull(routeId, "routeId");
         VeldtPage page = RouteRegistry.INSTANCE.getRouteContent(currentRouteId);
         this.currentRouteId = currentRouteId;
+        this.currentPage = page;
         this.titleLabel.setText(page.getTitle());
 
-        BorderPane.setAlignment(page, Pos.TOP_LEFT);
-        BorderPane.setMargin(page, new Insets(16, 16, 16, 16));
-        setCenter(page);
+        StackPane.setAlignment(page, Pos.TOP_LEFT);
+        rebuildCenterContent();
     }
 
     private void updateNavigationButtons() {
@@ -311,5 +333,90 @@ public class DashboardShell extends BorderPane {
         if (scene != null) {
             scene.setRoot(new PickAccountPane());
         }
+    }
+
+    public void showAddInstanceOverlay() {
+        if (this.addInstanceOverlay != null)
+            return;
+
+        hideAllTooltips();
+        this.addInstanceOverlay = new AddInstanceOverlay(this::hideAddInstanceOverlay, this::handleInstanceCreated);
+        rebuildCenterContent();
+        updateOverlayState();
+        Platform.runLater(this.addInstanceOverlay::requestFocus);
+    }
+
+    private void hideAddInstanceOverlay() {
+        if (this.addInstanceOverlay == null)
+            return;
+
+        this.addInstanceOverlay = null;
+        rebuildCenterContent();
+        updateOverlayState();
+    }
+
+    private void handleInstanceCreated() {
+        hideAddInstanceOverlay();
+        if (this.currentRouteId == RouteId.LIBRARY_ALL) {
+            reloadCurrentPage();
+            return;
+        }
+
+        this.navigator.navigateTo(RouteId.LIBRARY_ALL);
+    }
+
+    private void reloadCurrentPage() {
+        if (this.currentPage instanceof LibraryPage libraryPage) {
+            libraryPage.reload();
+        }
+    }
+
+    public void showInstancePlayOverlay(StoredInstanceMetadata instance) {
+        Objects.requireNonNull(instance, "instance");
+        if (this.instancePlayOverlay != null)
+            return;
+
+        hideAllTooltips();
+        this.instancePlayOverlay = new InstancePlayOverlay(instance, this::hideInstancePlayOverlay);
+        rebuildCenterContent();
+        updateOverlayState();
+        Platform.runLater(this.instancePlayOverlay::requestFocus);
+    }
+
+    private void hideInstancePlayOverlay() {
+        if (this.instancePlayOverlay == null)
+            return;
+
+        this.instancePlayOverlay.dispose();
+        this.instancePlayOverlay = null;
+        rebuildCenterContent();
+        updateOverlayState();
+        reloadCurrentPage();
+    }
+
+    private void rebuildCenterContent() {
+        if (this.currentPage == null)
+            return;
+
+        this.centerContainer.getChildren().setAll(this.currentPage);
+        if (this.addInstanceOverlay != null) {
+            this.centerContainer.getChildren().add(this.addInstanceOverlay);
+        }
+
+        if (this.instancePlayOverlay != null) {
+            this.centerContainer.getChildren().add(this.instancePlayOverlay);
+        }
+    }
+
+    private void updateOverlayState() {
+        boolean overlayOpen = this.addInstanceOverlay != null || this.instancePlayOverlay != null;
+        this.sidebar.setDisable(overlayOpen);
+        if (overlayOpen) {
+            this.previousButton.setDisable(true);
+            this.nextButton.setDisable(true);
+            return;
+        }
+
+        updateNavigationButtons();
     }
 }

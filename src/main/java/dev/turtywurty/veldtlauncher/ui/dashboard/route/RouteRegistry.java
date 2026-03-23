@@ -1,8 +1,8 @@
 package dev.turtywurty.veldtlauncher.ui.dashboard.route;
 
-import dev.turtywurty.veldtlauncher.ui.dashboard.page.VeldtPage;
-import dev.turtywurty.veldtlauncher.ui.dashboard.page.HomePage;
 import dev.turtywurty.veldtlauncher.ui.dashboard.page.PlaceholderPage;
+import dev.turtywurty.veldtlauncher.ui.dashboard.page.VeldtPage;
+import dev.turtywurty.veldtlauncher.ui.dashboard.page.library.LibraryPage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,12 +14,9 @@ public final class RouteRegistry {
     private final Map<RouteId, Supplier<VeldtPage>> routes = new HashMap<>();
 
     private RouteRegistry() {
-        registerRoute(RouteId.HOME, HomePage::new);
-        registerRoute(RouteId.LIBRARY_ALL, () -> new PlaceholderPage(
-                RouteId.LIBRARY_ALL,
-                "Library",
-                "Manage your installed instances, pick up where you left off, and keep your local launcher content organized."
-        ));
+        registerRoute(RouteId.LIBRARY_ALL, () -> new LibraryPage(RouteId.LIBRARY_ALL));
+        registerRoute(RouteId.LIBRARY_MODPACKS, () -> new LibraryPage(RouteId.LIBRARY_MODPACKS));
+        registerRoute(RouteId.LIBRARY_SERVERS, () -> new LibraryPage(RouteId.LIBRARY_SERVERS));
         registerRoute(RouteId.DISCOVER_MODPACKS, () -> new PlaceholderPage(
                 RouteId.DISCOVER_MODPACKS,
                 "Discover",

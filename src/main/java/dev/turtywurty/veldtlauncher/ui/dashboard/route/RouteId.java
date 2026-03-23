@@ -3,7 +3,6 @@ package dev.turtywurty.veldtlauncher.ui.dashboard.route;
 import dev.turtywurty.veldtlauncher.ui.dashboard.shell.SidebarItem;
 
 public enum RouteId {
-    HOME(SidebarItem.LIBRARY),
     LIBRARY_ALL(SidebarItem.LIBRARY),
     LIBRARY_MODPACKS(SidebarItem.LIBRARY),
     LIBRARY_SERVERS(SidebarItem.LIBRARY),

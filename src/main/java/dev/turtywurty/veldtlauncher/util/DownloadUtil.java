@@ -16,6 +16,7 @@ public final class DownloadUtil {
 
     public static void downloadFile(URI url, Path destination) throws IOException {
         try (InputStream inputStream = url.toURL().openStream()) {
+            Files.createDirectories(destination.getParent());
             Files.copy(inputStream, destination, StandardCopyOption.REPLACE_EXISTING);
         }
     }
@@ -48,6 +49,7 @@ public final class DownloadUtil {
     }
 
     public static void moveFile(Path source, Path target) throws IOException {
+        Files.createDirectories(target.getParent());
         Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
     }
 }

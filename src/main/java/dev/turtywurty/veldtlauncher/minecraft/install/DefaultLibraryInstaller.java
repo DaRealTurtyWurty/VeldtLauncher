@@ -1,5 +1,7 @@
 package dev.turtywurty.veldtlauncher.minecraft.install;
 
+import dev.turtywurty.veldtlauncher.instance.play.InstancePlayReporter;
+import dev.turtywurty.veldtlauncher.instance.play.InstancePlayStep;
 import dev.turtywurty.veldtlauncher.minecraft.metadata.VersionMetadata;
 import dev.turtywurty.veldtlauncher.minecraft.metadata.model.Extract;
 import dev.turtywurty.veldtlauncher.minecraft.metadata.model.Library;
@@ -21,6 +23,17 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class DefaultLibraryInstaller implements LibraryInstaller {
+    private static final URI DEFAULT_LIBRARY_BASE_URI = URI.create("https://libraries.minecraft.net/");
+    private final InstancePlayReporter reporter;
+
+    public DefaultLibraryInstaller() {
+        this(InstancePlayReporter.noOp());
+    }
+
+    public DefaultLibraryInstaller(InstancePlayReporter reporter) {
+        this.reporter = reporter;
+    }
+
     @Override
     public Path installLibraries(VersionMetadata metadata, Path gameDirectory) throws VersionInstallException {
         List<Library> libraries = metadata.libraries();
@@ -29,8 +42,13 @@ public class DefaultLibraryInstaller implements LibraryInstaller {
 
         Path librariesDirectory = gameDirectory.resolve(".minecraft").resolve("libraries");
         Path nativesDirectory = gameDirectory.resolve(".minecraft").resolve("versions").resolve(metadata.id()).resolve("natives");
+        this.reporter.progress(InstancePlayStep.INSTALLING_LIBRARIES, "Preparing libraries", 0, libraries.size());
+        int completed = 0;
         for (Library library : libraries) {
             installLibrary(library, librariesDirectory, nativesDirectory);
+            completed++;
+            String libraryName = library == null || library.name() == null ? "library" : library.name();
+            this.reporter.progress(InstancePlayStep.INSTALLING_LIBRARIES, "Processed " + libraryName, completed, libraries.size());
         }
 
         return librariesDirectory;
@@ -64,7 +82,7 @@ public class DefaultLibraryInstaller implements LibraryInstaller {
 
         Artifact artifact = downloads.artifact();
         if (artifact != null)
-            return artifact;
+            return withResolvedUri(library, artifact, null);
 
         return createFallbackArtifact(library, null);
     }
@@ -81,19 +99,35 @@ public class DefaultLibraryInstaller implements LibraryInstaller {
         Map<String, Artifact> classifiers = downloads == null ? Map.of() : downloads.classifiers();
         Artifact nativeArtifact = classifiers.get(classifier);
         if (nativeArtifact != null)
-            return nativeArtifact;
+            return withResolvedUri(library, nativeArtifact, classifier);
 
         return createFallbackArtifact(library, classifier);
     }
 
     private Artifact createFallbackArtifact(Library library, String classifier) throws VersionInstallException {
-        String libraryUrl = library.url() == null ? null : library.url().toString();
-        if (libraryUrl == null || libraryUrl.isBlank())
-            return null;
-
         String artifactPath = buildArtifactPath(library.name(), classifier);
-        URI uri = URI.create((libraryUrl.endsWith("/") ? libraryUrl : libraryUrl + "/") + artifactPath);
+        URI uri = resolveArtifactUri(library, artifactPath);
         return new Artifact(artifactPath, null, 0L, uri);
+    }
+
+    private Artifact withResolvedUri(Library library, Artifact artifact, String classifier) throws VersionInstallException {
+        if (artifact.uri() != null)
+            return artifact;
+
+        String artifactPath = artifact.path();
+        if (artifactPath == null || artifactPath.isBlank()) {
+            if (classifier == null)
+                return artifact;
+
+            artifactPath = buildArtifactPath(library.name(), classifier);
+        }
+
+        return new Artifact(
+                artifactPath,
+                artifact.sha1(),
+                artifact.size(),
+                resolveArtifactUri(library, artifactPath)
+        );
     }
 
     private String buildArtifactPath(String coordinate, String classifier) throws VersionInstallException {
@@ -115,6 +149,15 @@ public class DefaultLibraryInstaller implements LibraryInstaller {
         return groupPath + "/" + artifactId + "/" + version + "/" + fileName;
     }
 
+    private URI resolveArtifactUri(Library library, String artifactPath) {
+        if (artifactPath == null || artifactPath.isBlank())
+            return null;
+
+        URI baseUri = library.url() == null ? DEFAULT_LIBRARY_BASE_URI : library.url();
+        String base = baseUri.toString();
+        return URI.create((base.endsWith("/") ? base : base + "/") + artifactPath);
+    }
+
     private Path downloadArtifact(Library library, Artifact artifact, Path librariesDirectory) throws VersionInstallException {
         URI url = artifact.uri();
         if (url == null)
@@ -123,6 +166,7 @@ public class DefaultLibraryInstaller implements LibraryInstaller {
         Path libraryPath = librariesDirectory.resolve(requireArtifactPath(library, artifact));
         Path tempFilePath = libraryPath.resolveSibling(libraryPath.getFileName() + ".tmp");
         try {
+            this.reporter.log(InstancePlayStep.INSTALLING_LIBRARIES, "Checking " + library.name());
             Files.createDirectories(Objects.requireNonNull(libraryPath.getParent()));
             if (Files.exists(libraryPath) && isExistingArtifactValid(libraryPath, artifact))
                 return libraryPath;
@@ -130,6 +174,7 @@ public class DefaultLibraryInstaller implements LibraryInstaller {
             Files.deleteIfExists(libraryPath);
             Files.deleteIfExists(tempFilePath);
 
+            this.reporter.log(InstancePlayStep.INSTALLING_LIBRARIES, "Downloading " + library.name());
             DownloadUtil.downloadFile(url, tempFilePath);
             validateDownloadedArtifact(tempFilePath, artifact, library.name());
             DownloadUtil.moveFile(tempFilePath, libraryPath);
@@ -179,6 +224,7 @@ public class DefaultLibraryInstaller implements LibraryInstaller {
 
     private void extractNativeArchive(Path archivePath, Path nativesDirectory, Extract extract, String libraryName) throws VersionInstallException {
         try {
+            this.reporter.log(InstancePlayStep.INSTALLING_LIBRARIES, "Extracting natives for " + libraryName);
             Files.createDirectories(nativesDirectory);
             try (ZipInputStream inputStream = new ZipInputStream(Files.newInputStream(archivePath))) {
                 ZipEntry entry;

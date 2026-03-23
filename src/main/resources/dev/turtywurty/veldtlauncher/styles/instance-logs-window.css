@@ -1,0 +1,79 @@
+.instance-logs-window-root {
+    -fx-background-color: transparent;
+}
+
+.instance-logs-window-shell {
+    -fx-background-color: #101010;
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.34), 32, 0.22, 0, 12);
+}
+
+.instance-logs-window-top-bar {
+    -fx-background-color: #1a1a1a;
+    -fx-background-radius: 18 18 10 10;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 18 18 10 10;
+    -fx-border-width: 1;
+}
+
+.instance-logs-window-content {
+    -fx-padding: 14 16 16 16;
+}
+
+.instance-logs-window-log-scroll {
+    -fx-background-color: #0b0b0b;
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+}
+
+.instance-logs-window-log-scroll > .viewport {
+    -fx-background-color: #0b0b0b;
+    -fx-background-radius: 14;
+}
+
+.instance-logs-window-title {
+    -fx-text-fill: #f6f6f6;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 18px;
+    -fx-font-weight: 800;
+}
+
+.instance-logs-window-subtitle {
+    -fx-text-fill: rgba(222, 222, 222, 0.72);
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}
+
+.instance-logs-window-section-label {
+    -fx-text-fill: #f0f0f0;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+}
+
+.instance-logs-window-log-area {
+    -fx-background-color: #0b0b0b;
+    -fx-font-family: "Consolas", "Cascadia Mono", monospace;
+    -fx-font-size: 12px;
+}
+
+.instance-logs-window-log-area .content {
+    -fx-background-color: #0b0b0b;
+    -fx-padding: 14;
+}
+
+.instance-logs-window-log-scroll .scroll-bar:vertical,
+.instance-logs-window-log-scroll .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.instance-logs-window-log-scroll .thumb {
+    -fx-background-color: rgba(255, 255, 255, 0.16);
+    -fx-background-radius: 999;
+}

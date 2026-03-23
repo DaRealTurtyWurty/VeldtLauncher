@@ -138,7 +138,13 @@ public class DeviceCodeAuthStrategy implements AuthStrategy {
             this.secretStore.save("profile:" + profile.id() + ":minecraft_access_token", minecraftToken.accessToken());
             this.secretStore.save("profile:" + profile.id() + ":minecraft_access_token", minecraftToken.accessToken());
 
-            return new MinecraftSession(profile, minecraftToken.accessToken(), microsoftToken.refreshToken());
+            return new MinecraftSession(
+                    profile,
+                    minecraftToken.accessToken(),
+                    microsoftToken.refreshToken(),
+                    minecraftToken.username(),
+                    AuthConfig.getClientId()
+            );
         } catch (RuntimeException exception) {
             emit(new AuthenticationFailedEvent(errorMessage(exception)));
             throw exception;

@@ -37,6 +37,7 @@ javafx {
 dependencies {
     implementation("org.kordamp.ikonli:ikonli-javafx:12.4.0")
     implementation("org.kordamp.ikonli:ikonli-fontawesome6-pack:12.4.0")
+    implementation("org.fxmisc.richtext:richtextfx:0.11.7")
     implementation("io.javalin:javalin:7.1.0")
     implementation("com.google.code.gson:gson:2.13.2")
     implementation("org.slf4j:slf4j-api:2.0.17")

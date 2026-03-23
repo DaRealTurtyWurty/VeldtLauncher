@@ -1,0 +1,128 @@
+.instance-play-overlay {
+    -fx-alignment: center;
+}
+
+.instance-play-overlay-backdrop {
+    -fx-background-color: rgba(8, 8, 8, 0.72);
+}
+
+.instance-play-overlay-card {
+    -fx-background-color: #171717;
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(255, 255, 255, 0.10);
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+    -fx-padding: 24;
+    -fx-spacing: 16;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 32, 0.25, 0, 10);
+}
+
+.instance-play-overlay-title {
+    -fx-text-fill: #f7f7f7;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+}
+
+.instance-play-overlay-subtitle {
+    -fx-text-fill: rgba(228, 228, 228, 0.72);
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-line-spacing: 2px;
+}
+
+.instance-play-overlay-step {
+    -fx-text-fill: #f2f2f2;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+}
+
+.instance-play-overlay-detail {
+    -fx-text-fill: rgba(236, 236, 236, 0.78);
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+}
+
+.instance-play-overlay-percent {
+    -fx-text-fill: #f0f0f0;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+}
+
+.instance-play-overlay-progress {
+    -fx-pref-height: 10;
+    -fx-accent: #7bc96f;
+}
+
+.instance-play-overlay-progress > .track {
+    -fx-background-color: #101010;
+    -fx-background-radius: 999;
+}
+
+.instance-play-overlay-progress > .bar {
+    -fx-background-color: linear-gradient(to right, #4ea946, #7bc96f);
+    -fx-background-radius: 999;
+    -fx-background-insets: 0;
+}
+
+.instance-play-overlay-status {
+    -fx-text-fill: #f0f0f0;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+}
+
+.instance-play-overlay-status-success {
+    -fx-text-fill: #8dde7a;
+}
+
+.instance-play-overlay-status-error {
+    -fx-text-fill: #ff8c8c;
+}
+
+.instance-play-overlay-logs-label {
+    -fx-text-fill: #f0f0f0;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+}
+
+.instance-play-overlay-log-area {
+    -fx-background-color: #101010;
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-text-fill: #e8e8e8;
+    -fx-font-family: "Consolas", "Cascadia Mono", monospace;
+    -fx-font-size: 12px;
+    -fx-highlight-fill: rgba(123, 201, 111, 0.35);
+    -fx-highlight-text-fill: #ffffff;
+    -fx-padding: 0;
+}
+
+.instance-play-overlay-log-area .content {
+    -fx-background-color: #101010;
+    -fx-background-radius: 12;
+}
+
+.instance-play-overlay-log-area .scroll-pane,
+.instance-play-overlay-log-area .scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.instance-play-overlay-log-area .scroll-bar:vertical,
+.instance-play-overlay-log-area .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.instance-play-overlay-log-area .thumb {
+    -fx-background-color: rgba(255, 255, 255, 0.16);
+    -fx-background-radius: 999;
+}
+
+.instance-play-overlay-close-button {
+    -fx-min-width: 92;
+}

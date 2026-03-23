@@ -242,7 +242,7 @@ public final class VersionMetadataParser {
                 JsonUtil.getString(json, "path"),
                 JsonUtil.getString(json, "sha1"),
                 JsonUtil.getLong(json, "size"),
-                parseUri(JsonUtil.getString(json, "url"))
+                parseUri(getUriValue(json))
         );
     }
 
@@ -387,5 +387,13 @@ public final class VersionMetadataParser {
             return null;
 
         return URI.create(value);
+    }
+
+    private static String getUriValue(JsonObject json) {
+        String value = JsonUtil.getString(json, "url");
+        if (value != null && !value.isBlank())
+            return value;
+
+        return JsonUtil.getString(json, "uri");
     }
 }

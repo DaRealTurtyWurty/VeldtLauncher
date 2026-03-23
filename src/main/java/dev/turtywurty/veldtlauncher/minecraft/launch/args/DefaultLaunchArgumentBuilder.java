@@ -216,8 +216,8 @@ public class DefaultLaunchArgumentBuilder implements LaunchArgumentBuilder {
         placeholders.put("auth_uuid", profile == null ? "" : nullToEmpty(profile.id()));
         placeholders.put("auth_access_token", nullToEmpty(session.accessToken()));
         placeholders.put("auth_session", nullToEmpty(session.accessToken()));
-        placeholders.put("clientid", "");
-        placeholders.put("auth_xuid", "");
+        placeholders.put("clientid", nullToEmpty(session.clientId()));
+        placeholders.put("auth_xuid", nullToEmpty(session.accountId()));
         placeholders.put("user_type", "msa");
         placeholders.put("version_type", nullToEmpty(metadata.type()));
         placeholders.put("natives_directory", pathString(installResult.nativesDirectory()));

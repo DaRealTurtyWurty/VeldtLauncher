@@ -1,0 +1,195 @@
+.library-page-layout {
+    -fx-fill-width: true;
+}
+
+.library-page-content-container {
+    -fx-alignment: center;
+}
+
+.library-page-toggle-group {
+    -fx-background-color: rgba(255, 255, 255, 0.04);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-padding: 4;
+}
+
+.library-page-toggle {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-border-color: transparent;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-padding: 8 14 8 14;
+    -fx-text-fill: rgba(234, 234, 234, 0.72);
+}
+
+.library-page-toggle:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.04);
+    -fx-text-fill: #f0f0f0;
+}
+
+.library-page-toggle:selected {
+    -fx-background-color: #313131;
+    -fx-border-color: rgba(255, 255, 255, 0.10);
+    -fx-text-fill: #f6f6f6;
+}
+
+.library-page-content {
+    -fx-padding: 4 0 0 0;
+}
+
+.library-item {
+    -fx-alignment: center-left;
+    -fx-background-color: rgba(255, 255, 255, 0.03);
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-max-width: 320;
+    -fx-min-width: 320;
+    -fx-pref-width: 320;
+    -fx-padding: 14;
+    -fx-spacing: 12;
+}
+
+.library-item:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+}
+
+.library-item-icon-container {
+    -fx-alignment: center;
+    -fx-background-color: linear-gradient(to bottom right, #3b3b3b, #242424);
+    -fx-background-radius: 10;
+    -fx-min-height: 40;
+    -fx-min-width: 40;
+    -fx-pref-height: 40;
+    -fx-pref-width: 40;
+}
+
+.library-item-icon {
+    -fx-fit-height: 32;
+    -fx-fit-width: 32;
+}
+
+.library-item-icon-fallback {
+    -fx-text-fill: #f5f5f5;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+}
+
+.library-item-text {
+    -fx-spacing: 4;
+}
+
+.library-item-action-container {
+    -fx-alignment: center-right;
+    -fx-min-width: 34;
+    -fx-pref-width: 34;
+    -fx-max-width: 34;
+}
+
+.library-item-play-button {
+    -fx-alignment: center;
+    -fx-background-color: rgba(240, 240, 240, 0.14);
+    -fx-background-radius: 999;
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-radius: 999;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-min-width: 30;
+    -fx-pref-width: 30;
+    -fx-max-width: 30;
+    -fx-min-height: 30;
+    -fx-pref-height: 30;
+    -fx-max-height: 30;
+    -fx-opacity: 0;
+    -fx-padding: 0 0 0 1;
+}
+
+.library-item:hover .library-item-play-button {
+    -fx-opacity: 1;
+}
+
+.library-item-play-button:hover {
+    -fx-background-color: rgba(240, 240, 240, 0.22);
+    -fx-border-color: rgba(255, 255, 255, 0.18);
+}
+
+.library-item-play-icon {
+    -fx-icon-color: #f4f4f4;
+    -fx-icon-size: 11;
+}
+
+.library-item-title {
+    -fx-fill: #f2f2f2;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+}
+
+.library-item-description {
+    -fx-fill: rgba(226, 226, 226, 0.68);
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 12px;
+}
+
+.library-placeholder {
+    -fx-alignment: center;
+    -fx-spacing: 12;
+    -fx-padding: 40 24 24 24;
+}
+
+.library-placeholder-icon {
+    -fx-icon-color: rgba(255, 255, 255, 0.72);
+    -fx-icon-size: 42;
+}
+
+.library-placeholder-title {
+    -fx-text-fill: #f2f2f2;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 18px;
+    -fx-font-weight: 700;
+}
+
+.library-placeholder-description {
+    -fx-max-width: 420;
+    -fx-pref-width: 420;
+    -fx-text-alignment: center;
+    -fx-text-fill: rgba(226, 226, 226, 0.68);
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+}
+
+.library-placeholder-button {
+    -fx-alignment: center;
+    -fx-background-color: #313131;
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(255, 255, 255, 0.10);
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-graphic-text-gap: 8;
+    -fx-padding: 10 14 10 14;
+    -fx-text-fill: #f4f4f4;
+}
+
+.library-placeholder-button-icon {
+    -fx-icon-color: #f4f4f4;
+    -fx-icon-size: 12;
+}
+
+.library-placeholder-button:hover {
+    -fx-background-color: #3a3a3a;
+}

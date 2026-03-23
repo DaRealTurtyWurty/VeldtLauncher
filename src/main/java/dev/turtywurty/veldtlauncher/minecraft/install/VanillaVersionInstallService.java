@@ -1,5 +1,7 @@
 package dev.turtywurty.veldtlauncher.minecraft.install;
 
+import dev.turtywurty.veldtlauncher.instance.play.InstancePlayReporter;
+import dev.turtywurty.veldtlauncher.instance.play.InstancePlayStep;
 import dev.turtywurty.veldtlauncher.minecraft.install.assets.AssetInstaller;
 import dev.turtywurty.veldtlauncher.minecraft.install.assets.DefaultAssetInstaller;
 import dev.turtywurty.veldtlauncher.minecraft.manifest.VersionManifestService;
@@ -13,43 +15,61 @@ public class VanillaVersionInstallService implements VersionInstallService {
     private final ClientInstaller clientInstaller;
     private final LibraryInstaller libraryInstaller;
     private final AssetInstaller assetInstaller;
+    private final InstancePlayReporter reporter;
 
     public VanillaVersionInstallService(
             VersionManifestService versionManifestService,
             ClientInstaller clientInstaller,
             LibraryInstaller libraryInstaller,
-            AssetInstaller assetInstaller
+            AssetInstaller assetInstaller,
+            InstancePlayReporter reporter
     ) {
         this.versionManifestService = versionManifestService;
         this.clientInstaller = clientInstaller;
         this.libraryInstaller = libraryInstaller;
         this.assetInstaller = assetInstaller;
+        this.reporter = reporter;
     }
 
     public VanillaVersionInstallService(VersionManifestService versionManifestService) {
-        this(versionManifestService, new DefaultClientInstaller(), new DefaultLibraryInstaller(), new DefaultAssetInstaller());
+        this(versionManifestService, InstancePlayReporter.noOp());
+    }
+
+    public VanillaVersionInstallService(VersionManifestService versionManifestService, InstancePlayReporter reporter) {
+        this(
+                versionManifestService,
+                new DefaultClientInstaller(reporter),
+                new DefaultLibraryInstaller(reporter),
+                new DefaultAssetInstaller(reporter),
+                reporter
+        );
     }
 
     @Override
     public InstallResult install(VersionMetadata metadata, Path gameDirectory) throws VersionInstallException {
         validateManifest(metadata);
         validateGameDirectory(gameDirectory);
+        this.reporter.progress(InstancePlayStep.PREPARING_DIRECTORIES, "Preparing instance directories", 0D);
         createDirectories(gameDirectory, metadata);
+        this.reporter.progress(InstancePlayStep.PREPARING_DIRECTORIES, "Instance directories are ready", 1D);
+        this.reporter.progress(InstancePlayStep.SAVING_METADATA, "Saving version metadata", 0D);
         writeVersionMetadata(metadata);
+        this.reporter.progress(InstancePlayStep.SAVING_METADATA, "Version metadata saved", 1D);
         installClient(metadata, gameDirectory);
         installLibraries(metadata, gameDirectory);
         installAssetIndex(metadata, gameDirectory);
         installAssets(metadata, gameDirectory);
 
-        Path versionDirectory = gameDirectory.resolve(".minecraft").resolve("versions").resolve(metadata.id());
+        Path minecraftDirectory = resolveMinecraftDirectory(gameDirectory);
+        Path versionDirectory = minecraftDirectory.resolve("versions").resolve(metadata.id());
         return new InstallResult(
                 metadata.id(),
                 gameDirectory,
                 versionDirectory,
                 versionDirectory.resolve(metadata.id() + ".json"),
                 versionDirectory.resolve(metadata.id() + ".jar"),
-                versionDirectory.resolve("libs"),
-                versionDirectory.resolve("assets"),
+                minecraftDirectory.resolve("libraries"),
+                minecraftDirectory.resolve("assets"),
                 versionDirectory.resolve("natives"),
                 true
         );
@@ -68,21 +88,18 @@ public class VanillaVersionInstallService implements VersionInstallService {
         if (gameDirectory == null)
             throw new VersionInstallException("Game directory cannot be null");
 
-        if (Files.notExists(gameDirectory))
-            throw new VersionInstallException("Game directory does not exist");
-
-        if (!Files.isDirectory(gameDirectory))
+        if (Files.exists(gameDirectory) && !Files.isDirectory(gameDirectory))
             throw new VersionInstallException("Game directory is not a directory");
 
-        if (!Files.isReadable(gameDirectory))
+        if (Files.exists(gameDirectory) && !Files.isReadable(gameDirectory))
             throw new VersionInstallException("Game directory is not readable");
 
-        if (!Files.isWritable(gameDirectory))
+        if (Files.exists(gameDirectory) && !Files.isWritable(gameDirectory))
             throw new VersionInstallException("Game directory is not writable");
     }
 
     private void createDirectories(Path gameDirectory, VersionMetadata metadata) throws VersionInstallException {
-        Path minecraftDirectory = gameDirectory.resolve(".minecraft");
+        Path minecraftDirectory = resolveMinecraftDirectory(gameDirectory);
         Path versionsDirectory = minecraftDirectory.resolve("versions");
         Path versionDirectory = versionsDirectory.resolve(metadata.id());
         Path librariesDirectory = minecraftDirectory.resolve("libraries");
@@ -100,6 +117,10 @@ public class VanillaVersionInstallService implements VersionInstallService {
         } catch (Exception exception) {
             throw new VersionInstallException("Failed to create necessary directories", exception);
         }
+    }
+
+    private Path resolveMinecraftDirectory(Path gameDirectory) {
+        return gameDirectory.resolve(".minecraft");
     }
 
     private void writeVersionMetadata(VersionMetadata metadata) throws VersionInstallException {

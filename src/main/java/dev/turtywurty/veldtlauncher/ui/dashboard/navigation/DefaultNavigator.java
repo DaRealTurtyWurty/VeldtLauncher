@@ -18,7 +18,7 @@ public final class DefaultNavigator implements Navigator {
     private RouteId currentPage;
 
     public DefaultNavigator() {
-        this(RouteRegistry.INSTANCE, RouteId.HOME);
+        this(RouteRegistry.INSTANCE, RouteId.LIBRARY_ALL);
     }
 
     public DefaultNavigator(RouteId initialRouteId) {

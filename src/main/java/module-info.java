@@ -1,5 +1,7 @@
 module dev.turtywurty.veldtlauncher {
     requires javafx.controls;
+    requires org.fxmisc.richtext;
+    requires org.fxmisc.flowless;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.fontawesome6;
 
@@ -14,4 +16,10 @@ module dev.turtywurty.veldtlauncher {
 
     exports dev.turtywurty.veldtlauncher;
     opens dev.turtywurty.veldtlauncher.auth.session to com.google.gson;
+    opens dev.turtywurty.veldtlauncher.instance to com.google.gson;
+    opens dev.turtywurty.veldtlauncher.minecraft.metadata to com.google.gson;
+    opens dev.turtywurty.veldtlauncher.minecraft.metadata.model to com.google.gson;
+    opens dev.turtywurty.veldtlauncher.minecraft.metadata.model.argument to com.google.gson;
+    opens dev.turtywurty.veldtlauncher.minecraft.metadata.model.download to com.google.gson;
+    opens dev.turtywurty.veldtlauncher.minecraft.metadata.model.logging to com.google.gson;
 }

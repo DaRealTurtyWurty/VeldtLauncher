@@ -1,7 +1,12 @@
 package dev.turtywurty.veldtlauncher.minecraft.manifest;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializer;
+import dev.turtywurty.veldtlauncher.config.FileConfig;
 import dev.turtywurty.veldtlauncher.minecraft.metadata.VersionMetadata;
 import dev.turtywurty.veldtlauncher.minecraft.metadata.VersionMetadataParser;
 import dev.turtywurty.veldtlauncher.util.JsonUtil;
@@ -12,6 +17,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +25,15 @@ public class MojangVersionManifestService implements VersionManifestService {
     // TODO: This will be put into settings later, but for now we can just hardcode it here
     private static final boolean USE_OLD_LAUNCHER_META = false;
 
-    private static final Gson GSON = new Gson();
+    public static final MojangVersionManifestService INSTANCE =
+            new MojangVersionManifestService(FileConfig.resolveConfigFile(FileConfig.getGameDirectory()));
+
+    private static final Gson GSON = new GsonBuilder()
+            .registerTypeAdapter(Instant.class, (JsonSerializer<Instant>) (src, _, _) ->
+                    src == null ? null : new JsonPrimitive(src.toString()))
+            .registerTypeAdapter(Instant.class, (JsonDeserializer<Instant>) (json, _, _) ->
+                    json == null || json.isJsonNull() ? null : Instant.parse(json.getAsString()))
+            .create();
 
     private final HttpClient httpClient;
     private final VersionManifestCache cache;

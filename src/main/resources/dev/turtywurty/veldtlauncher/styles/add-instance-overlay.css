@@ -1,0 +1,377 @@
+.add-instance-overlay {
+    -fx-alignment: center;
+}
+
+.add-instance-overlay-backdrop {
+    -fx-background-color: rgba(8, 8, 8, 0.72);
+}
+
+.add-instance-overlay-card {
+    -fx-background-color: #171717;
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(255, 255, 255, 0.10);
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+    -fx-padding: 24;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 32, 0.25, 0, 10);
+}
+
+.add-instance-overlay-title {
+    -fx-text-fill: #f7f7f7;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+}
+
+.add-instance-overlay-subtitle {
+    -fx-text-fill: rgba(228, 228, 228, 0.72);
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-line-spacing: 2px;
+}
+
+.add-instance-overlay-type-bar {
+    -fx-alignment: top-left;
+}
+
+.add-instance-overlay-type-toggle {
+    -fx-alignment: center-left;
+    -fx-background-color: rgba(255, 255, 255, 0.03);
+    -fx-background-radius: 16;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-max-width: Infinity;
+    -fx-min-height: 88;
+    -fx-pref-height: 88;
+    -fx-padding: 14;
+}
+
+.add-instance-overlay-type-toggle:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-border-color: rgba(255, 255, 255, 0.14);
+}
+
+.add-instance-overlay-type-toggle:selected {
+    -fx-background-color: rgba(255, 255, 255, 0.09);
+    -fx-border-color: rgba(255, 255, 255, 0.22);
+}
+
+.add-instance-overlay-type-content {
+    -fx-alignment: center-left;
+}
+
+.add-instance-overlay-type-icon-wrap {
+    -fx-alignment: center;
+    -fx-min-width: 22;
+    -fx-pref-width: 22;
+    -fx-max-width: 22;
+}
+
+.add-instance-overlay-type-icon {
+    -fx-icon-color: #f0f0f0;
+    -fx-icon-size: 18;
+}
+
+.add-instance-overlay-type-copy {
+    -fx-alignment: center-left;
+}
+
+.add-instance-overlay-type-title {
+    -fx-text-fill: #f3f3f3;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+}
+
+.add-instance-overlay-type-description {
+    -fx-text-fill: rgba(232, 232, 232, 0.66);
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 12px;
+    -fx-line-spacing: 1px;
+}
+
+.add-instance-overlay-type-toggle:selected .add-instance-overlay-type-description {
+    -fx-text-fill: rgba(240, 240, 240, 0.82);
+}
+
+.add-instance-overlay-checkbox {
+    -fx-text-fill: #e8e8e8;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+}
+
+.add-instance-overlay-checkbox .box {
+    -fx-background-color: #101010;
+    -fx-background-radius: 6;
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+}
+
+.add-instance-overlay-checkbox:hover .box {
+    -fx-border-color: rgba(255, 255, 255, 0.18);
+}
+
+.add-instance-overlay-checkbox:selected .box {
+    -fx-background-color: #f0f0f0;
+    -fx-border-color: #f0f0f0;
+}
+
+.add-instance-overlay-checkbox .mark {
+    -fx-background-color: transparent;
+}
+
+.add-instance-overlay-checkbox:selected .mark {
+    -fx-background-color: #141414;
+}
+
+.add-instance-overlay-field-label {
+    -fx-text-fill: #f0f0f0;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+}
+
+.add-instance-overlay-input,
+.add-instance-overlay-textarea,
+.add-instance-overlay-choice {
+    -fx-background-color: #101010;
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-text-fill: #f0f0f0;
+    -fx-prompt-text-fill: rgba(240, 240, 240, 0.35);
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+}
+
+.add-instance-overlay-input,
+.add-instance-overlay-choice {
+    -fx-pref-height: 40;
+}
+
+.add-instance-overlay-choice {
+    -fx-cursor: hand;
+}
+
+.add-instance-overlay-choice:hover {
+    -fx-border-color: rgba(255, 255, 255, 0.16);
+}
+
+.add-instance-overlay-choice:focused {
+    -fx-border-color: rgba(255, 255, 255, 0.22);
+}
+
+.add-instance-overlay-input,
+.add-instance-overlay-textarea {
+    -fx-padding: 10 12 10 12;
+}
+
+.add-instance-overlay-choice .text-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: #f0f0f0;
+}
+
+.add-instance-overlay-textarea .content {
+    -fx-background-color: #101010;
+    -fx-background-radius: 12;
+}
+
+.add-instance-overlay-choice .label,
+.add-instance-overlay-choice .list-cell {
+    -fx-text-fill: #f0f0f0;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+}
+
+.add-instance-overlay-choice > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0 12 12 0;
+    -fx-padding: 0 12 0 8;
+}
+
+.add-instance-overlay-choice .arrow {
+    -fx-background-color: #f0f0f0;
+}
+
+.add-instance-overlay-choice > .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 0 38 0 12;
+}
+
+.add-instance-overlay-choice .combo-box-popup > .list-view {
+    -fx-background-color: #151515;
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(255, 255, 255, 0.10);
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-padding: 6;
+}
+
+.add-instance-overlay-choice .combo-box-popup > .list-view .list-cell {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-padding: 8 10 8 10;
+    -fx-text-fill: #ededed;
+}
+
+.add-instance-overlay-choice .combo-box-popup > .list-view .list-cell:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.06);
+}
+
+.add-instance-overlay-choice .combo-box-popup > .list-view .list-cell:selected {
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-text-fill: #ffffff;
+}
+
+.add-instance-overlay-choice .combo-box-popup > .list-view .scroll-bar:vertical,
+.add-instance-overlay-choice .combo-box-popup > .list-view .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.add-instance-overlay-choice .combo-box-popup > .list-view .thumb {
+    -fx-background-color: rgba(255, 255, 255, 0.16);
+    -fx-background-radius: 999;
+}
+
+.add-instance-overlay-identity-row {
+    -fx-alignment: top-left;
+}
+
+.add-instance-overlay-name-group {
+    -fx-alignment: top-left;
+}
+
+.add-instance-overlay-image-picker {
+    -fx-alignment: center;
+}
+
+.add-instance-overlay-image-preview {
+    -fx-alignment: center;
+    -fx-background-color: #101010;
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+}
+
+.add-instance-overlay-image-preview-view {
+    -fx-opacity: 0.98;
+}
+
+.add-instance-overlay-image-preview-fallback {
+    -fx-icon-color: rgba(240, 240, 240, 0.42);
+    -fx-icon-size: 28;
+}
+
+.add-instance-overlay-image-edit-button {
+    -fx-background-color: rgba(20, 20, 20, 0.96);
+    -fx-background-radius: 999;
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-radius: 999;
+    -fx-min-width: 28;
+    -fx-pref-width: 28;
+    -fx-max-width: 28;
+    -fx-min-height: 28;
+    -fx-pref-height: 28;
+    -fx-max-height: 28;
+    -fx-padding: 0;
+}
+
+.add-instance-overlay-image-edit-icon {
+    -fx-icon-color: #f0f0f0;
+    -fx-icon-size: 11;
+}
+
+.add-instance-overlay-multi-select {
+    -fx-background-color: #101010;
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-padding: 10;
+}
+
+.add-instance-overlay-chip-pane {
+    -fx-padding: 0 0 2 0;
+}
+
+.add-instance-overlay-multi-select-placeholder {
+    -fx-text-fill: rgba(240, 240, 240, 0.35);
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+}
+
+.add-instance-overlay-chip {
+    -fx-alignment: center-left;
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-radius: 999;
+    -fx-border-color: rgba(255, 255, 255, 0.10);
+    -fx-border-radius: 999;
+    -fx-border-width: 1;
+    -fx-padding: 6 6 6 10;
+}
+
+.add-instance-overlay-chip-label {
+    -fx-text-fill: #f0f0f0;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+}
+
+.add-instance-overlay-chip-remove {
+    -fx-alignment: center;
+    -fx-background-color: rgba(255, 255, 255, 0.10);
+    -fx-background-radius: 999;
+    -fx-border-color: transparent;
+    -fx-background-insets: 0;
+    -fx-cursor: hand;
+    -fx-min-width: 20;
+    -fx-pref-width: 20;
+    -fx-max-width: 20;
+    -fx-min-height: 20;
+    -fx-pref-height: 20;
+    -fx-max-height: 20;
+    -fx-padding: 0;
+    -fx-text-fill: #f0f0f0;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+}
+
+.add-instance-overlay-chip-remove:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.18);
+}
+
+.add-instance-overlay-error {
+    -fx-text-fill: #ffb0b0;
+    -fx-font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}
+
+.add-instance-overlay-create-button {
+    -fx-background-color: #f0f0f0;
+    -fx-border-color: #f0f0f0;
+    -fx-text-fill: #111111;
+}
+
+.add-instance-overlay-next-button {
+    -fx-background-color: #f0f0f0;
+    -fx-border-color: #f0f0f0;
+    -fx-text-fill: #111111;
+}
+
+.add-instance-overlay-next-button:hover,
+.add-instance-overlay-create-button:hover {
+    -fx-background-color: #ffffff;
+}
+
+.add-instance-overlay-back-button,
+.add-instance-overlay-cancel-button {
+    -fx-background-color: rgba(24, 24, 24, 0.92);
+}

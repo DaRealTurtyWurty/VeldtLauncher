@@ -9,7 +9,7 @@ public class DefaultInstalledVersionService implements InstalledVersionService {
         if (versionId == null || versionId.isBlank() || gameDirectory == null)
             return null;
 
-        Path minecraftDirectory = gameDirectory.resolve(".minecraft");
+        Path minecraftDirectory = resolveMinecraftDirectory(gameDirectory);
         Path versionDirectory = minecraftDirectory.resolve("versions").resolve(versionId);
         Path versionJson = versionDirectory.resolve(versionId + ".json");
         Path clientJar = versionDirectory.resolve(versionId + ".jar");
@@ -28,5 +28,9 @@ public class DefaultInstalledVersionService implements InstalledVersionService {
                 Files.isDirectory(nativesDirectory) ? nativesDirectory : null,
                 false
         );
+    }
+
+    private Path resolveMinecraftDirectory(Path gameDirectory) {
+        return gameDirectory.resolve(".minecraft");
     }
 }
