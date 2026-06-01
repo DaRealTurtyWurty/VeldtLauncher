@@ -2,6 +2,7 @@ package dev.turtywurty.veldtlauncher.ui.dashboard.route;
 
 import dev.turtywurty.veldtlauncher.ui.dashboard.page.PlaceholderPage;
 import dev.turtywurty.veldtlauncher.ui.dashboard.page.VeldtPage;
+import dev.turtywurty.veldtlauncher.ui.dashboard.page.instance.ViewInstancePage;
 import dev.turtywurty.veldtlauncher.ui.dashboard.page.library.LibraryPage;
 
 import java.util.HashMap;
@@ -17,6 +18,7 @@ public final class RouteRegistry {
         registerRoute(RouteId.LIBRARY_ALL, () -> new LibraryPage(RouteId.LIBRARY_ALL));
         registerRoute(RouteId.LIBRARY_MODPACKS, () -> new LibraryPage(RouteId.LIBRARY_MODPACKS));
         registerRoute(RouteId.LIBRARY_SERVERS, () -> new LibraryPage(RouteId.LIBRARY_SERVERS));
+        registerRoute(RouteId.VIEW_INSTANCE, ViewInstancePage::new);
         registerRoute(RouteId.DISCOVER_MODPACKS, () -> new PlaceholderPage(
                 RouteId.DISCOVER_MODPACKS,
                 "Discover",

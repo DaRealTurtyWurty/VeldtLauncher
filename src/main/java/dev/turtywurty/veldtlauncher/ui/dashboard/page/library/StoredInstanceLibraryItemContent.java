@@ -5,6 +5,7 @@ import dev.turtywurty.veldtlauncher.instance.StoredModpackInstanceMetadata;
 import dev.turtywurty.veldtlauncher.instance.StoredServerInstanceMetadata;
 import dev.turtywurty.veldtlauncher.instance.StoredVanillaInstanceMetadata;
 import dev.turtywurty.veldtlauncher.ui.dashboard.navigation.Navigator;
+import dev.turtywurty.veldtlauncher.ui.dashboard.page.instance.SelectedInstanceContext;
 import dev.turtywurty.veldtlauncher.ui.dashboard.route.RouteId;
 import dev.turtywurty.veldtlauncher.ui.dashboard.route.RouteRegistry;
 import dev.turtywurty.veldtlauncher.ui.dashboard.shell.DashboardShell;
@@ -59,8 +60,10 @@ public record StoredInstanceLibraryItemContent(StoredInstanceMetadata instance) 
     @Override
     public Consumer<Navigator> getOnClickAction() {
         return navigator -> {
-            if (RouteRegistry.INSTANCE.hasRoute(RouteId.VIEW_INSTANCE))
+            if (RouteRegistry.INSTANCE.hasRoute(RouteId.VIEW_INSTANCE)) {
+                SelectedInstanceContext.select(this.instance);
                 navigator.navigateTo(RouteId.VIEW_INSTANCE);
+            }
         };
     }
 
